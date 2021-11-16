@@ -53,7 +53,7 @@ public class ConnectionDetails {
                 "id=" + id +
                 ", ipAddress='" + ipAddress + '\'' +
                 ", port=" + port +
-                ", user=" + user +
+                ", user_id=" + user.getId() +
                 '}';
     }
 }
