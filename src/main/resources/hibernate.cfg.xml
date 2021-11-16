@@ -25,5 +25,6 @@
         <property name="hibernate.dbcp.minIdle">5</property>
         <property name="hibernate.dbcp.maxWaitMillis">-1</property>
         <mapping class="com.haidousm.LAURona.entity.User"/>
+        <mapping class="com.haidousm.LAURona.entity.ConnectionDetails"/>
     </session-factory>
 </hibernate-configuration>
