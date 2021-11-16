@@ -13,30 +13,47 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
-        User testUser = new User("John", "Doe",
-                "jdoe@thedoes.com", "jdoe", "hunter32",
-                true, "/src/new/certs/jdoe.pdf", "/src/new/imgs/jdoe.png");
+        User testUserA = new User("A", "Z",
+                "A@AZ.com", "az", "hunter32",
+                true, "/src/new/certs/az.pdf", "/src/new/imgs/az.png");
+        ConnectionDetails connectionDetailsA = new ConnectionDetails("192.168.32.1", 3200, testUserA);
+        LocationDetails locationDetailsA = new LocationDetails(124.5, -12.5, System.currentTimeMillis() / 1000L, testUserA);
+        HealthStatus healthStatusA = new HealthStatus(Health.SAFE, System.currentTimeMillis() / 1000L, testUserA);
 
-        ConnectionDetails connectionDetails = new ConnectionDetails("192.168.32.1", 3200, testUser);
 
-        LocationDetails locationDetails = new LocationDetails(124.5, -12.5, System.currentTimeMillis() / 1000L, testUser);
+        User testUserB = new User("B", "Y", "B@AY.com", "by", "hunter32", false, "/src/new/certs/by.pdf", "/src/new/imgs/by.png");
+        ConnectionDetails connectionDetailsB = new ConnectionDetails("172.12.255.44", 8080, testUserB);
+        LocationDetails locationDetailsB = new LocationDetails(75.5, 32, System.currentTimeMillis() / 1000L, testUserB);
+        HealthStatus healthStatusB = new HealthStatus(Health.CONTAGIOUS, System.currentTimeMillis() / 1000L, testUserB);
 
-        HealthStatus healthStatus = new HealthStatus(Health.SAFE, System.currentTimeMillis() / 1000L, testUser);
 
         Transaction tx;
 
-        tx = HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
-        HibernateUtil.getSessionFactory().getCurrentSession().save(testUser);
-        HibernateUtil.getSessionFactory().getCurrentSession().save(connectionDetails);
-        HibernateUtil.getSessionFactory().getCurrentSession().save(locationDetails);
-        HibernateUtil.getSessionFactory().getCurrentSession().save(healthStatus);
+        tx = HibernateUtil.beginTransaction();
+        HibernateUtil.getSession().save(testUserA);
+        HibernateUtil.getSession().save(connectionDetailsA);
+        HibernateUtil.getSession().save(locationDetailsA);
+        HibernateUtil.getSession().save(healthStatusA);
         tx.commit();
 
-        tx = HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
-        List<User> users = HibernateUtil.getSessionFactory().getCurrentSession().createQuery("from User", User.class).list();
-        List<ConnectionDetails> connectionDetailsList = HibernateUtil.getSessionFactory().getCurrentSession().createQuery("from ConnectionDetails", ConnectionDetails.class).list();
-        List<LocationDetails> locationDetailsList = HibernateUtil.getSessionFactory().getCurrentSession().createQuery("from LocationDetails", LocationDetails.class).list();
-        List<HealthStatus> healthStatusList = HibernateUtil.getSessionFactory().getCurrentSession().createQuery("from HealthStatus", HealthStatus.class).list();
+        tx = HibernateUtil.beginTransaction();
+        HibernateUtil.getSession().save(testUserB);
+        HibernateUtil.getSession().save(connectionDetailsB);
+        HibernateUtil.getSession().save(locationDetailsB);
+        HibernateUtil.getSession().save(healthStatusB);
+        tx.commit();
+
+        testUserB.trustUser(testUserA);
+        tx = HibernateUtil.beginTransaction();
+        HibernateUtil.getSession().update(testUserA);
+        HibernateUtil.getSession().update(testUserB);
+        tx.commit();
+
+        tx = HibernateUtil.getSession().beginTransaction();
+        List<User> users = HibernateUtil.getSession().createQuery("from User", User.class).list();
+        List<ConnectionDetails> connectionDetailsList = HibernateUtil.getSession().createQuery("from ConnectionDetails", ConnectionDetails.class).list();
+        List<LocationDetails> locationDetailsList = HibernateUtil.getSession().createQuery("from LocationDetails", LocationDetails.class).list();
+        List<HealthStatus> healthStatusList = HibernateUtil.getSession().createQuery("from HealthStatus", HealthStatus.class).list();
         tx.commit();
 
         System.out.println("-------------------");
