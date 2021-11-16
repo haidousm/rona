@@ -27,5 +27,6 @@
         <mapping class="com.haidousm.LAURona.entity.User"/>
         <mapping class="com.haidousm.LAURona.entity.ConnectionDetails"/>
         <mapping class="com.haidousm.LAURona.entity.LocationDetails"/>
+        <mapping class="com.haidousm.LAURona.entity.HealthStatus"/>
     </session-factory>
 </hibernate-configuration>

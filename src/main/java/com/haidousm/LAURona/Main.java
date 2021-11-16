@@ -1,8 +1,10 @@
 package com.haidousm.LAURona;
 
 import com.haidousm.LAURona.entity.ConnectionDetails;
+import com.haidousm.LAURona.entity.HealthStatus;
 import com.haidousm.LAURona.entity.LocationDetails;
 import com.haidousm.LAURona.entity.User;
+import com.haidousm.LAURona.enums.Health;
 import com.haidousm.LAURona.utils.HibernateUtil;
 import org.hibernate.Transaction;
 
@@ -19,24 +21,32 @@ public class Main {
 
         LocationDetails locationDetails = new LocationDetails(124.5, -12.5, System.currentTimeMillis() / 1000L, testUser);
 
+        HealthStatus healthStatus = new HealthStatus(Health.SAFE, System.currentTimeMillis() / 1000L, testUser);
+
         Transaction tx;
 
         tx = HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         HibernateUtil.getSessionFactory().getCurrentSession().save(testUser);
         HibernateUtil.getSessionFactory().getCurrentSession().save(connectionDetails);
         HibernateUtil.getSessionFactory().getCurrentSession().save(locationDetails);
+        HibernateUtil.getSessionFactory().getCurrentSession().save(healthStatus);
         tx.commit();
 
         tx = HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         List<User> users = HibernateUtil.getSessionFactory().getCurrentSession().createQuery("from User", User.class).list();
         List<ConnectionDetails> connectionDetailsList = HibernateUtil.getSessionFactory().getCurrentSession().createQuery("from ConnectionDetails", ConnectionDetails.class).list();
         List<LocationDetails> locationDetailsList = HibernateUtil.getSessionFactory().getCurrentSession().createQuery("from LocationDetails", LocationDetails.class).list();
+        List<HealthStatus> healthStatusList = HibernateUtil.getSessionFactory().getCurrentSession().createQuery("from HealthStatus", HealthStatus.class).list();
+        tx.commit();
+
         System.out.println("-------------------");
         users.forEach(System.out::println);
         System.out.println("-------------------");
         connectionDetailsList.forEach(System.out::println);
         System.out.println("-------------------");
         locationDetailsList.forEach(System.out::println);
-        tx.commit();
+        System.out.println("-------------------");
+        healthStatusList.forEach(System.out::println);
+        System.out.println("-------------------");
     }
 }
