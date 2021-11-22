@@ -1,10 +1,11 @@
-package com.haidousm.LAURona.server;
+package com.haidousm.LAURona.requests;
 
 import com.haidousm.LAURona.enums.Method;
 
 public class Request {
     private final Method method;
     private final String body;
+
 
     public Request(String untokenizedRequest) {
         String[] tokens = untokenizedRequest.split(";;", 2);

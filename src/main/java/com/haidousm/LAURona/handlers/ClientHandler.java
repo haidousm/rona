@@ -1,9 +1,14 @@
-package com.haidousm.LAURona.server;
+package com.haidousm.LAURona.handlers;
 
+import com.google.gson.Gson;
 import com.haidousm.LAURona.enums.Status;
+import com.haidousm.LAURona.requests.LoginRequest;
+import com.haidousm.LAURona.requests.Request;
+import com.haidousm.LAURona.response.Response;
 
 import java.io.*;
 import java.net.Socket;
+
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -48,13 +53,13 @@ public class ClientHandler implements Runnable {
         Response response;
         switch (request.getMethod()) {
             case LOGIN:
-                response = login(request);
+                response = handleLogin(request);
                 break;
             case REGISTER:
-                response = register(request);
+                response = handleRegister(request);
                 break;
             case GET_USER_INFO:
-                response = getUserInfo(request);
+                response = handleGetUserInfo(request);
                 break;
             default:
                 response = new Response();
@@ -64,19 +69,35 @@ public class ClientHandler implements Runnable {
         return response;
     }
 
-    private Response login(Request request) {
+    private Response handleLogin(Request request) {
+        Response response = new Response();
+        try {
+            LoginRequest loginRequest = new Gson().fromJson(request.getBody(), LoginRequest.class);
+            response = login(loginRequest);
+        } catch (Exception e) {
+            response.setStatus(Status.BAD_REQUEST);
+        }
+        return response;
+    }
+
+    private Response login(LoginRequest loginRequest) {
+        Response response = new Response();
+        response.setStatus(Status.SUCCESS);
+        if (loginRequest.getUsername().equals("admin") && loginRequest.getPassword().equals("admin")) {
+            response.setBody("{\"token\":\"admin\"}");
+        } else {
+            response.setStatus(Status.UNAUTHORIZED);
+        }
+        return response;
+    }
+
+    private Response handleRegister(Request request) {
         Response response = new Response();
         response.setStatus(Status.SUCCESS);
         return response;
     }
 
-    private Response register(Request request) {
-        Response response = new Response();
-        response.setStatus(Status.SUCCESS);
-        return response;
-    }
-
-    private Response getUserInfo(Request request) {
+    private Response handleGetUserInfo(Request request) {
         Response response = new Response();
         response.setStatus(Status.SUCCESS);
         return response;

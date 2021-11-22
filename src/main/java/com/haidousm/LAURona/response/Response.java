@@ -1,10 +1,11 @@
-package com.haidousm.LAURona.server;
+package com.haidousm.LAURona.response;
 
+import com.google.gson.Gson;
 import com.haidousm.LAURona.enums.Status;
 
 public class Response {
     private Status status;
-    private String body;
+    private String body = "";
 
     public Response() {
 
@@ -32,10 +33,7 @@ public class Response {
     }
 
     public String toString() {
-        return "{" +
-                "status: " + status +
-                ", body: " + body +
-                "}";
+        return new Gson().toJson(this);
     }
 }
 
