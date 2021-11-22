@@ -1,8 +1,9 @@
 package com.haidousm.LAURona.server;
 
+import com.haidousm.LAURona.enums.Status;
+
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -24,10 +25,9 @@ public class ClientHandler implements Runnable {
         try {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                if (line.equals("exit")) {
-                    break;
-                }
-                bufferedWriter.write("Server:" + line);
+                Request request = new Request(line);
+                Response response = handleRequest(request);
+                bufferedWriter.write(response.toString());
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }
@@ -43,4 +43,43 @@ public class ClientHandler implements Runnable {
             }
         }
     }
+
+    private Response handleRequest(Request request) {
+        Response response;
+        switch (request.getMethod()) {
+            case LOGIN:
+                response = login(request);
+                break;
+            case REGISTER:
+                response = register(request);
+                break;
+            case GET_USER_INFO:
+                response = getUserInfo(request);
+                break;
+            default:
+                response = new Response();
+                response.setStatus(Status.BAD_REQUEST);
+                break;
+        }
+        return response;
+    }
+
+    private Response login(Request request) {
+        Response response = new Response();
+        response.setStatus(Status.SUCCESS);
+        return response;
+    }
+
+    private Response register(Request request) {
+        Response response = new Response();
+        response.setStatus(Status.SUCCESS);
+        return response;
+    }
+
+    private Response getUserInfo(Request request) {
+        Response response = new Response();
+        response.setStatus(Status.SUCCESS);
+        return response;
+    }
+
 }

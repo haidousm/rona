@@ -21,7 +21,6 @@ public class Server {
 
     public void start() {
         try {
-
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(socket);
