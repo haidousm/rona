@@ -1,10 +1,15 @@
 package com.haidousm.LAURona.handlers;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.haidousm.LAURona.entity.User;
 import com.haidousm.LAURona.enums.Status;
 import com.haidousm.LAURona.requests.LoginRequest;
 import com.haidousm.LAURona.requests.Request;
+import com.haidousm.LAURona.requests.UserDetailsRequest;
 import com.haidousm.LAURona.response.Response;
+import com.haidousm.LAURona.utils.HibernateUtil;
+import org.hibernate.Transaction;
 
 import java.io.*;
 import java.net.Socket;
@@ -12,11 +17,13 @@ import java.net.Socket;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
+    private Gson gson;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
+        this.gson = new GsonBuilder().create();
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -58,8 +65,8 @@ public class ClientHandler implements Runnable {
             case REGISTER:
                 response = handleRegister(request);
                 break;
-            case GET_USER_INFO:
-                response = handleGetUserInfo(request);
+            case GET_USER:
+                response = handleGetUserDetails(request);
                 break;
             default:
                 response = new Response();
@@ -72,7 +79,7 @@ public class ClientHandler implements Runnable {
     private Response handleLogin(Request request) {
         Response response = new Response();
         try {
-            LoginRequest loginRequest = new Gson().fromJson(request.getBody(), LoginRequest.class);
+            LoginRequest loginRequest = gson.fromJson(request.getBody(), LoginRequest.class);
             response = login(loginRequest);
         } catch (Exception e) {
             response.setStatus(Status.BAD_REQUEST);
@@ -97,10 +104,41 @@ public class ClientHandler implements Runnable {
         return response;
     }
 
-    private Response handleGetUserInfo(Request request) {
+    private Response handleGetUserDetails(Request request) {
         Response response = new Response();
-        response.setStatus(Status.SUCCESS);
+        try {
+            UserDetailsRequest userDetailsRequest = gson.fromJson(request.getBody(), UserDetailsRequest.class);
+            response = getUserDetails(userDetailsRequest);
+        } catch (Exception e) {
+            response.setStatus(Status.BAD_REQUEST);
+        }
         return response;
     }
 
+    private Response getUserDetails(UserDetailsRequest userDetailsRequest) {
+        Response response = new Response();
+        response.setStatus(Status.SUCCESS);
+        if (userDetailsRequest.getID() != 0) {
+            Transaction tx = HibernateUtil.beginTransaction();
+            User user = HibernateUtil.getSession().get(User.class, userDetailsRequest.getID());
+            tx.commit();
+            response.setBody(gson.toJson(user));
+        } else if (userDetailsRequest.getUsername() != null) {
+            Transaction tx = HibernateUtil.beginTransaction();
+            User user = HibernateUtil.getSession().createQuery("from User where username = :username", User.class)
+                    .setParameter("username", userDetailsRequest.getUsername()).getSingleResult();
+            tx.commit();
+            response.setBody(gson.toJson(user));
+        } else if (userDetailsRequest.getEmail() != null) {
+            Transaction tx = HibernateUtil.beginTransaction();
+            User user = HibernateUtil.getSession().createQuery("from User where email = :email", User.class)
+                    .setParameter("email", userDetailsRequest.getEmail()).getSingleResult();
+            tx.commit();
+            response.setBody(gson.toJson(user));
+
+        } else {
+            response.setStatus(Status.BAD_REQUEST);
+        }
+        return response;
+    }
 }

@@ -3,7 +3,7 @@ package com.haidousm.LAURona.enums;
 public enum Method {
     LOGIN("LOGIN"),
     REGISTER("REGISTER"),
-    GET_USER_INFO("GET_USER_INFO"),
+    GET_USER("GET_USER"),
     UNDEFINED("UNDEFINED");
 
     private String method;
