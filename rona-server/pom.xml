@@ -46,7 +46,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.haidousm.rona.Main</mainClass>
+                            <mainClass>com.haidousm.rona.com.haidousm.rona.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

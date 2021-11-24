@@ -16,6 +16,7 @@ public class Server {
         this.port = port;
         try {
             serverSocket = new ServerSocket(port);
+            serverSocket.setReuseAddress(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
