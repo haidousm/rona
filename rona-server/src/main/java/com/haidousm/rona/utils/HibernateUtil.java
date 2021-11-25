@@ -1,4 +1,4 @@
-package com.haidousm.LAURona.utils;
+package com.haidousm.rona.utils;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

@@ -1,4 +1,4 @@
-package com.haidousm.LAURona.enums;
+package com.haidousm.rona.enums;
 
 public enum Health {
     SAFE,

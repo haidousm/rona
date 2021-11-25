@@ -1,4 +1,4 @@
-package com.haidousm.LAURona.entity;
+package com.haidousm.rona.entity;
 
 import javax.persistence.*;
 

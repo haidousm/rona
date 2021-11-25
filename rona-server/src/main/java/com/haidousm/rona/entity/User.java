@@ -1,4 +1,4 @@
-package com.haidousm.LAURona.entity;
+package com.haidousm.rona.entity;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,10 +18,10 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     @Column(name = "password")
