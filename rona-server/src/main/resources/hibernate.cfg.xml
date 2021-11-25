@@ -29,5 +29,6 @@
         <mapping class="com.haidousm.rona.entity.ConnectionDetails"/>
         <mapping class="com.haidousm.rona.entity.LocationDetails"/>
         <mapping class="com.haidousm.rona.entity.HealthStatus"/>
+        <mapping class="com.haidousm.rona.entity.UserAuthToken"/>
     </session-factory>
 </hibernate-configuration>
