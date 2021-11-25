@@ -4,6 +4,7 @@ public enum Method {
     LOGIN("LOGIN"),
     REGISTER("REGISTER"),
     GET_USER("GET_USER"),
+    GET_ALL_USERS("GET_ALL_USERS"),
     UNDEFINED("UNDEFINED");
 
     private String method;

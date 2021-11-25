@@ -5,14 +5,19 @@ import com.google.gson.GsonBuilder;
 import com.haidousm.rona.entity.User;
 import com.haidousm.rona.enums.Status;
 import com.haidousm.rona.requests.LoginRequest;
+import com.haidousm.rona.requests.RegisterUserRequest;
 import com.haidousm.rona.requests.Request;
 import com.haidousm.rona.requests.UserDetailsRequest;
 import com.haidousm.rona.response.Response;
 import com.haidousm.rona.utils.HibernateUtil;
+import com.haidousm.rona.utils.MiscUtils;
 import org.hibernate.Transaction;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 
 public class ClientHandler implements Runnable {
@@ -68,6 +73,9 @@ public class ClientHandler implements Runnable {
             case GET_USER:
                 response = handleGetUserDetails(request);
                 break;
+            case GET_ALL_USERS:
+                response = handleGetAllUsers();
+                break;
             default:
                 response = new Response();
                 response.setStatus(Status.BAD_REQUEST);
@@ -100,7 +108,49 @@ public class ClientHandler implements Runnable {
 
     private Response handleRegister(Request request) {
         Response response = new Response();
+        try {
+            RegisterUserRequest registerUserRequest = gson.fromJson(request.getBody(), RegisterUserRequest.class);
+            response = register(registerUserRequest);
+        } catch (Exception e) {
+            response.setStatus(Status.BAD_REQUEST);
+        }
+        return response;
+    }
+
+    private Response register(RegisterUserRequest registerUserRequest) {
+        Response response = new Response();
         response.setStatus(Status.SUCCESS);
+
+        if (registerUserRequest.getImageFile().isEmpty()) {
+            response.setStatus(Status.BAD_REQUEST);
+            return response;
+        }
+
+        if (registerUserRequest.isVaccinated() && registerUserRequest.getVaccineCertificateFile().isEmpty()) {
+            response.setStatus(Status.BAD_REQUEST);
+            return response;
+        }
+
+        Path imageFilePath = Paths.get("user-data", "user-images", registerUserRequest.getUsername() + ".jpg");
+        Path vaccineCertificateFilePath = Path.of("");
+        try {
+            MiscUtils.decodeBase64ToFile(registerUserRequest.getImageFile(), imageFilePath);
+            if (registerUserRequest.isVaccinated()) {
+                vaccineCertificateFilePath = Paths.get("user-data", "vaccine-certificates", registerUserRequest.getUsername() + ".pdf");
+                MiscUtils.decodeBase64ToFile(registerUserRequest.getVaccineCertificateFile(), vaccineCertificateFilePath);
+            }
+
+            User newUser = new User(registerUserRequest.getFirstname(), registerUserRequest.getLastname(), registerUserRequest.getEmail(), registerUserRequest.getUsername(), registerUserRequest.getPassword(), registerUserRequest.isVaccinated(), vaccineCertificateFilePath.toString(), imageFilePath.toString());
+
+            Transaction tx = HibernateUtil.beginTransaction();
+            HibernateUtil.getSession().save(newUser);
+            tx.commit();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(Status.BAD_REQUEST);
+        }
+
         return response;
     }
 
@@ -139,6 +189,26 @@ public class ClientHandler implements Runnable {
         } else {
             response.setStatus(Status.BAD_REQUEST);
         }
+        return response;
+    }
+
+    private Response handleGetAllUsers() {
+        Response response = new Response();
+        try {
+            response = getAllUsers();
+        } catch (Exception e) {
+            response.setStatus(Status.BAD_REQUEST);
+        }
+        return response;
+    }
+
+    private Response getAllUsers() {
+        Response response = new Response();
+        response.setStatus(Status.SUCCESS);
+        Transaction tx = HibernateUtil.beginTransaction();
+        List<User> users = HibernateUtil.getSession().createQuery("from User", User.class).getResultList();
+        tx.commit();
+        response.setBody(gson.toJson(users));
         return response;
     }
 }
