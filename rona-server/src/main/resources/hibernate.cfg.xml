@@ -25,10 +25,10 @@
         <property name="hibernate.dbcp.maxIdle">10</property>
         <property name="hibernate.dbcp.minIdle">5</property>
         <property name="hibernate.dbcp.maxWaitMillis">-1</property>
-        <mapping class="com.haidousm.rona.entity.User"/>
-        <mapping class="com.haidousm.rona.entity.ConnectionDetails"/>
-        <mapping class="com.haidousm.rona.entity.LocationDetails"/>
-        <mapping class="com.haidousm.rona.entity.HealthStatus"/>
-        <mapping class="com.haidousm.rona.entity.UserAuthToken"/>
+        <mapping class="com.haidousm.rona.server.entity.User"/>
+        <mapping class="com.haidousm.rona.server.entity.ConnectionDetails"/>
+        <mapping class="com.haidousm.rona.server.entity.LocationDetails"/>
+        <mapping class="com.haidousm.rona.server.entity.HealthStatus"/>
+        <mapping class="com.haidousm.rona.server.entity.UserAuthToken"/>
     </session-factory>
 </hibernate-configuration>

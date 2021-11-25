@@ -13,7 +13,7 @@
     <modules>
         <module>rona-client</module>
         <module>rona-server</module>
+        <module>rona-common</module>
     </modules>
-
 
 </project>
