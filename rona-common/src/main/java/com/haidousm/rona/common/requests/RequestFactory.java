@@ -1,9 +1,9 @@
 package com.haidousm.rona.common.requests;
 
 import com.google.gson.Gson;
-import com.haidousm.rona.common.builders.LoginRequestBuilder;
-import com.haidousm.rona.common.builders.RegisterRequestBuilder;
-import com.haidousm.rona.common.builders.UserDetailsRequestBuilder;
+import com.haidousm.rona.common.requests.builders.LoginRequestBuilder;
+import com.haidousm.rona.common.requests.builders.RegisterRequestBuilder;
+import com.haidousm.rona.common.requests.builders.UserDetailsRequestBuilder;
 import com.haidousm.rona.common.enums.Method;
 
 public class RequestFactory {

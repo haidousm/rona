@@ -6,12 +6,9 @@ import com.haidousm.rona.client.client.Client;
 import com.haidousm.rona.client.controllers.UserController;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.responses.LoginResponse;
-import com.haidousm.rona.common.responses.RegisterResponse;
-import com.haidousm.rona.common.responses.Response;
+import com.haidousm.rona.common.responses.GenericResponse;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Main {
 
@@ -25,8 +22,8 @@ public class Main {
 //        System.out.println(registerResponse);
         Request loginRequest = UserController.prepareLogin("haidousm", "123456");
         client.send(loginRequest);
-        Response response = new Gson().fromJson(client.receive(), Response.class);
-        LoginResponse loginResponse = new Gson().fromJson(response.getBody(), LoginResponse.class);
+        GenericResponse genericResponse = new Gson().fromJson(client.receive(), GenericResponse.class);
+        LoginResponse loginResponse = new Gson().fromJson(genericResponse.getBody(), LoginResponse.class);
         System.out.println(loginResponse);
     }
 }

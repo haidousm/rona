@@ -1,11 +1,7 @@
 package com.haidousm.rona.client.controllers;
 
-import com.google.gson.Gson;
-import com.haidousm.rona.common.builders.LoginRequestBuilder;
-import com.haidousm.rona.common.builders.RegisterRequestBuilder;
-import com.haidousm.rona.common.enums.Method;
-import com.haidousm.rona.common.requests.LoginRequest;
-import com.haidousm.rona.common.requests.RegisterRequest;
+import com.haidousm.rona.common.requests.builders.LoginRequestBuilder;
+import com.haidousm.rona.common.requests.builders.RegisterRequestBuilder;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.utils.MiscUtils;
 

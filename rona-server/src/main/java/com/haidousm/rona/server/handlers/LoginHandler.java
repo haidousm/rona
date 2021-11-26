@@ -1,11 +1,13 @@
 package com.haidousm.rona.server.handlers;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.haidousm.rona.common.responses.LoginResponse;
+import com.haidousm.rona.common.responses.Response;
+import com.haidousm.rona.common.responses.builders.LoginResponseBuilder;
 import com.haidousm.rona.server.entity.User;
 import com.haidousm.rona.common.requests.LoginRequest;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.responses.Response;
+import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.entity.UserAuthToken;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.server.utils.HibernateUtil;
@@ -13,19 +15,21 @@ import org.hibernate.Transaction;
 
 public class LoginHandler {
 
-    public static Response handleLogin(Request request) {
-        Response response = new Response();
+    public static GenericResponse handleLogin(Request request) {
+        GenericResponse genericResponse = new GenericResponse();
         try {
-            response = login((LoginRequest) request);
+            LoginResponse loginResponse = login((LoginRequest) request);
+            genericResponse.setStatus(loginResponse.getStatus());
+            genericResponse.setBody(new GsonBuilder().create().toJson(loginResponse));
         } catch (Exception e) {
-            response.setStatus(Status.BAD_REQUEST);
+            genericResponse.setStatus(Status.BAD_REQUEST);
         }
-        return response;
+        return genericResponse;
     }
 
-    private static Response login(LoginRequest loginRequest) {
-        Response response = new Response();
-        response.setStatus(Status.SUCCESS);
+    private static LoginResponse login(LoginRequest loginRequest) {
+        LoginResponse loginResponse = LoginResponseBuilder.builder().build();
+        loginResponse.setStatus(Status.SUCCESS);
 
         Transaction tx;
         tx = HibernateUtil.beginTransaction();
@@ -33,9 +37,11 @@ public class LoginHandler {
             User user = (User) HibernateUtil.getSession().createQuery("from User where username = :username").setParameter("username", loginRequest.getUsername()).uniqueResult();
             tx.commit();
             if (user == null) {
-                response.setStatus(Status.USER_NOT_FOUND);
+                loginResponse.setStatus(Status.USER_NOT_FOUND);
+                return loginResponse;
             } else if (!user.getPassword().equals(loginRequest.getPassword())) {
-                response.setStatus(Status.INCORRECT_CREDENTIALS);
+                loginResponse.setStatus(Status.INCORRECT_CREDENTIALS);
+                return loginResponse;
             }
 
             tx = HibernateUtil.beginTransaction();
@@ -52,13 +58,14 @@ public class LoginHandler {
 
             HibernateUtil.getSession().save(userAuthToken);
             tx.commit();
-            response.setBody(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(userAuthToken));
+            loginResponse = LoginResponseBuilder.builder().setToken(token).setExpiryTimestamp(expiryTimestamp).build();
+            loginResponse.setStatus(Status.SUCCESS);
 
         } catch (Exception e) {
-            response.setStatus(Status.INTERNAL_SERVER_ERROR);
+            loginResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
         }
 
-        return response;
+        return loginResponse;
     }
 
     private static String generateAuthToken(int length) {

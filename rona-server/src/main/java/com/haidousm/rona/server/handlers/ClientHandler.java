@@ -1,10 +1,8 @@
 package com.haidousm.rona.server.handlers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.requests.RequestFactory;
-import com.haidousm.rona.common.responses.Response;
+import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.enums.Status;
 
 import java.io.*;
@@ -32,8 +30,8 @@ public class ClientHandler implements Runnable {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 Request request = RequestFactory.createRequest(line);
-                Response response = handleRequest(request);
-                bufferedWriter.write(response.toString());
+                GenericResponse genericResponse = handleRequest(request);
+                bufferedWriter.write(genericResponse.toString());
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }
@@ -50,26 +48,26 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private Response handleRequest(Request request) {
-        Response response;
+    private GenericResponse handleRequest(Request request) {
+        GenericResponse genericResponse;
         switch (request.getMethod()) {
             case LOGIN:
-                response = LoginHandler.handleLogin(request);
+                genericResponse = LoginHandler.handleLogin(request);
                 break;
             case REGISTER:
-                response = RegisterHandler.handleRegister(request);
+                genericResponse = RegisterHandler.handleRegister(request);
                 break;
             case GET_USER:
-                response = UserDetailsHandler.handleGetUserDetails(request);
+                genericResponse = UserDetailsHandler.handleGetUserDetails(request);
                 break;
             case GET_ALL_USERS:
-                response = UserDetailsHandler.handleGetAllUserDetails();
+                genericResponse = UserDetailsHandler.handleGetAllUserDetails();
                 break;
             default:
-                response = new Response();
-                response.setStatus(Status.BAD_REQUEST);
+                genericResponse = new GenericResponse();
+                genericResponse.setStatus(Status.BAD_REQUEST);
                 break;
         }
-        return response;
+        return genericResponse;
     }
 }

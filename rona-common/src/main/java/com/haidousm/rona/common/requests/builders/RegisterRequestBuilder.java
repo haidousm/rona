@@ -1,4 +1,4 @@
-package com.haidousm.rona.common.builders;
+package com.haidousm.rona.common.requests.builders;
 
 import com.google.gson.Gson;
 import com.haidousm.rona.common.requests.RegisterRequest;
