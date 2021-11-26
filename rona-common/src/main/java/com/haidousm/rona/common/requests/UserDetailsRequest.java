@@ -1,8 +1,9 @@
 package com.haidousm.rona.common.requests;
 
+import com.haidousm.rona.common.enums.Method;
 import com.sun.istack.Nullable;
 
-public class UserDetailsRequest {
+public class UserDetailsRequest implements Request {
 
     @Nullable
     private int ID;
@@ -10,6 +11,12 @@ public class UserDetailsRequest {
     private String email;
     @Nullable
     private String username;
+
+    public UserDetailsRequest(int ID, String email, String username) {
+        this.ID = ID;
+        this.email = email;
+        this.username = username;
+    }
 
     public Integer getID() {
         return ID;
@@ -21,5 +28,9 @@ public class UserDetailsRequest {
 
     public String getUsername() {
         return username;
+    }
+
+    public Method getMethod() {
+        return Method.GET_USER;
     }
 }

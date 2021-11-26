@@ -1,9 +1,11 @@
 package com.haidousm.rona.client.controllers;
 
 import com.google.gson.Gson;
+import com.haidousm.rona.common.builders.LoginRequestBuilder;
+import com.haidousm.rona.common.builders.RegisterRequestBuilder;
 import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.requests.LoginRequest;
-import com.haidousm.rona.common.requests.RegisterUserRequest;
+import com.haidousm.rona.common.requests.RegisterRequest;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.utils.MiscUtils;
 
@@ -23,15 +25,14 @@ public class UserController {
         if (imageFilePath.toFile().exists()) {
             imageFile = MiscUtils.encodeFileToBase64(imageFilePath);
         }
-        RegisterUserRequest registerUserRequest = new RegisterUserRequest(firstname, lastname, email, username, password, isVaccinated, vaccineCertificateFile, imageFile);
-        return new Request(Method.REGISTER, new Gson().toJson(registerUserRequest));
+        return RegisterRequestBuilder.builder().setFirstname(firstname).setLastname(lastname).setEmail(email).setUsername(username).setPassword(password).setVaccinated(isVaccinated).setVaccineCertificateFile(vaccineCertificateFile).setImageFile(imageFile).build();
     }
 
     public static Request prepareLogin(String username, String password) {
         // TODO: validate input
         // TODO: encrypt password?
 
-        return new Request(Method.LOGIN, new Gson().toJson(new LoginRequest(username, password)));
+        return LoginRequestBuilder.builder().setUsername(username).setPassword(password).build();
     }
 
 }

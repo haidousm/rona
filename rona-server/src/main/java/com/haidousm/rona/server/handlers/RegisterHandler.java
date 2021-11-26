@@ -1,12 +1,12 @@
 package com.haidousm.rona.server.handlers;
 
 import com.google.gson.Gson;
-import com.haidousm.rona.common.responses.RegisteredUserResponse;
+import com.haidousm.rona.common.responses.RegisterResponse;
 import com.haidousm.rona.server.entity.User;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.responses.Response;
 import com.haidousm.rona.common.enums.Status;
-import com.haidousm.rona.common.requests.RegisterUserRequest;
+import com.haidousm.rona.common.requests.RegisterRequest;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import com.haidousm.rona.common.utils.MiscUtils;
 import org.hibernate.Transaction;
@@ -18,45 +18,44 @@ public class RegisterHandler {
     public static Response handleRegister(Request request) {
         Response response = new Response();
         try {
-            RegisterUserRequest registerUserRequest = new Gson().fromJson(request.getBody(), RegisterUserRequest.class);
-            response = register(registerUserRequest);
+            response = register((RegisterRequest) request);
         } catch (Exception e) {
             response.setStatus(Status.BAD_REQUEST);
         }
         return response;
     }
 
-    private static Response register(RegisterUserRequest registerUserRequest) {
+    private static Response register(RegisterRequest registerRequest) {
         Response response = new Response();
         response.setStatus(Status.SUCCESS);
 
-        if (registerUserRequest.getImageFile().isEmpty()) {
+        if (registerRequest.getImageFile().isEmpty()) {
             response.setStatus(Status.BAD_REQUEST);
             return response;
         }
 
-        if (registerUserRequest.isVaccinated() && registerUserRequest.getVaccineCertificateFile().isEmpty()) {
+        if (registerRequest.isVaccinated() && registerRequest.getVaccineCertificateFile().isEmpty()) {
             response.setStatus(Status.BAD_REQUEST);
             return response;
         }
 
-        Path imageFilePath = Paths.get("user-data", "user-images", registerUserRequest.getUsername() + ".jpg");
+        Path imageFilePath = Paths.get("user-data", "user-images", registerRequest.getUsername() + ".jpg");
         Path vaccineCertificateFilePath = Path.of("");
         try {
-            MiscUtils.decodeBase64ToFile(registerUserRequest.getImageFile(), imageFilePath);
-            if (registerUserRequest.isVaccinated()) {
-                vaccineCertificateFilePath = Paths.get("user-data", "vaccine-certificates", registerUserRequest.getUsername() + ".pdf");
-                MiscUtils.decodeBase64ToFile(registerUserRequest.getVaccineCertificateFile(), vaccineCertificateFilePath);
+            MiscUtils.decodeBase64ToFile(registerRequest.getImageFile(), imageFilePath);
+            if (registerRequest.isVaccinated()) {
+                vaccineCertificateFilePath = Paths.get("user-data", "vaccine-certificates", registerRequest.getUsername() + ".pdf");
+                MiscUtils.decodeBase64ToFile(registerRequest.getVaccineCertificateFile(), vaccineCertificateFilePath);
             }
 
-            User newUser = new User(registerUserRequest.getFirstname(), registerUserRequest.getLastname(), registerUserRequest.getEmail(), registerUserRequest.getUsername(), registerUserRequest.getPassword(), registerUserRequest.isVaccinated(), vaccineCertificateFilePath.toString(), imageFilePath.toString());
+            User newUser = new User(registerRequest.getFirstname(), registerRequest.getLastname(), registerRequest.getEmail(), registerRequest.getUsername(), registerRequest.getPassword(), registerRequest.isVaccinated(), vaccineCertificateFilePath.toString(), imageFilePath.toString());
 
             Transaction tx = HibernateUtil.beginTransaction();
             HibernateUtil.getSession().save(newUser);
             tx.commit();
 
-            RegisteredUserResponse registeredUserResponse = new RegisteredUserResponse(newUser.getId());
-            response.setBody(new Gson().toJson(registeredUserResponse));
+            RegisterResponse registerResponse = new RegisterResponse(newUser.getId());
+            response.setBody(new Gson().toJson(registerResponse));
 
         } catch (Exception e) {
             e.printStackTrace();

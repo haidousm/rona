@@ -16,8 +16,7 @@ public class LoginHandler {
     public static Response handleLogin(Request request) {
         Response response = new Response();
         try {
-            LoginRequest loginRequest = new Gson().fromJson(request.getBody(), LoginRequest.class);
-            response = login(loginRequest);
+            response = login((LoginRequest) request);
         } catch (Exception e) {
             response.setStatus(Status.BAD_REQUEST);
         }

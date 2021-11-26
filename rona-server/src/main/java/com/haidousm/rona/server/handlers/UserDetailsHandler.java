@@ -16,8 +16,7 @@ public class UserDetailsHandler {
     public static Response handleGetUserDetails(Request request) {
         Response response = new Response();
         try {
-            UserDetailsRequest userDetailsRequest = new Gson().fromJson(request.getBody(), UserDetailsRequest.class);
-            response = getUserDetails(userDetailsRequest);
+            response = getUserDetails((UserDetailsRequest) request);
         } catch (Exception e) {
             response.setStatus(Status.BAD_REQUEST);
         }

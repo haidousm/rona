@@ -3,6 +3,7 @@ package com.haidousm.rona.server.handlers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.haidousm.rona.common.requests.Request;
+import com.haidousm.rona.common.requests.RequestFactory;
 import com.haidousm.rona.common.responses.Response;
 import com.haidousm.rona.common.enums.Status;
 
@@ -12,13 +13,11 @@ import java.net.Socket;
 
 public class ClientHandler implements Runnable {
     private final Socket socket;
-    private final Gson gson;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
-        this.gson = new GsonBuilder().create();
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -32,7 +31,7 @@ public class ClientHandler implements Runnable {
         try {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                Request request = new Request(line);
+                Request request = RequestFactory.createRequest(line);
                 Response response = handleRequest(request);
                 bufferedWriter.write(response.toString());
                 bufferedWriter.newLine();

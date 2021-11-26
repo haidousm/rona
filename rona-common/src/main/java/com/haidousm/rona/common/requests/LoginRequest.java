@@ -2,8 +2,9 @@ package com.haidousm.rona.common.requests;
 
 
 import com.google.gson.Gson;
+import com.haidousm.rona.common.enums.Method;
 
-public class LoginRequest {
+public class LoginRequest implements Request {
     private String username;
     private String password;
 
@@ -22,6 +23,10 @@ public class LoginRequest {
 
     public String toString() {
         return new Gson().toJson(this);
+    }
+
+    public Method getMethod() {
+        return Method.LOGIN;
     }
 
 }

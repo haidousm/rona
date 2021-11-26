@@ -1,11 +1,12 @@
 package com.haidousm.rona.common.responses;
 
 import com.google.gson.GsonBuilder;
+import com.haidousm.rona.common.enums.Method;
 
-public class RegisteredUserResponse {
+public class RegisterResponse {
     private int userID;
 
-    public RegisteredUserResponse(int userID) {
+    public RegisterResponse(int userID) {
         this.userID = userID;
     }
 

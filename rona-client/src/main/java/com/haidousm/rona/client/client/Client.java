@@ -1,6 +1,7 @@
 package com.haidousm.rona.client.client;
 
 import com.haidousm.rona.common.requests.Request;
+import com.haidousm.rona.common.requests.RequestFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class Client {
     }
 
     public void send(Request request) {
-        out.println(request.toString());
+        out.println(RequestFactory.createRequestString(request));
         out.flush();
     }
 

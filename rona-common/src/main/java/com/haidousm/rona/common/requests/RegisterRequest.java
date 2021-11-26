@@ -1,6 +1,8 @@
 package com.haidousm.rona.common.requests;
 
-public class RegisterUserRequest {
+import com.haidousm.rona.common.enums.Method;
+
+public class RegisterRequest implements Request {
     private String firstname;
     private String lastname;
     private String email;
@@ -10,7 +12,7 @@ public class RegisterUserRequest {
     private String vaccineCertificateFile;
     private String imageFile;
 
-    public RegisterUserRequest(String firstname, String lastname, String email, String username, String password, boolean isVaccinated, String vaccineCertificateFile, String imageFile) {
+    public RegisterRequest(String firstname, String lastname, String email, String username, String password, boolean isVaccinated, String vaccineCertificateFile, String imageFile) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
@@ -53,5 +55,7 @@ public class RegisterUserRequest {
         return imageFile;
     }
 
-
+    public Method getMethod() {
+        return Method.REGISTER;
+    }
 }
