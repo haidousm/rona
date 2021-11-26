@@ -10,6 +10,17 @@ public class RegisterUserRequest {
     private String vaccineCertificateFile;
     private String imageFile;
 
+    public RegisterUserRequest(String firstname, String lastname, String email, String username, String password, boolean isVaccinated, String vaccineCertificateFile, String imageFile) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.isVaccinated = isVaccinated;
+        this.vaccineCertificateFile = vaccineCertificateFile;
+        this.imageFile = imageFile;
+    }
+
     public String getFirstname() {
         return firstname;
     }

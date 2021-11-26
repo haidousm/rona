@@ -1,4 +1,4 @@
-package com.haidousm.rona.server.response;
+package com.haidousm.rona.common.responses;
 
 import com.google.gson.Gson;
 import com.haidousm.rona.common.enums.Status;

@@ -1,13 +1,14 @@
 package com.haidousm.rona.server.handlers;
 
 import com.google.gson.Gson;
+import com.haidousm.rona.common.responses.RegisteredUserResponse;
 import com.haidousm.rona.server.entity.User;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.server.response.Response;
+import com.haidousm.rona.common.responses.Response;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.RegisterUserRequest;
 import com.haidousm.rona.server.utils.HibernateUtil;
-import com.haidousm.rona.server.utils.MiscUtils;
+import com.haidousm.rona.common.utils.MiscUtils;
 import org.hibernate.Transaction;
 
 import java.nio.file.Path;
@@ -53,6 +54,9 @@ public class RegisterHandler {
             Transaction tx = HibernateUtil.beginTransaction();
             HibernateUtil.getSession().save(newUser);
             tx.commit();
+
+            RegisteredUserResponse registeredUserResponse = new RegisteredUserResponse(newUser.getId());
+            response.setBody(new Gson().toJson(registeredUserResponse));
 
         } catch (Exception e) {
             e.printStackTrace();

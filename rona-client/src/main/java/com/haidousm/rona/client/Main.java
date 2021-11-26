@@ -1,6 +1,13 @@
 package com.haidousm.rona.client;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.haidousm.rona.client.client.Client;
+import com.haidousm.rona.client.controllers.UserController;
+import com.haidousm.rona.common.requests.Request;
+import com.haidousm.rona.common.responses.RegisteredUserResponse;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -11,14 +18,13 @@ import java.util.Base64;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Socket socket = new Socket("0.0.0.0", 1234);
-        InputStream in = socket.getInputStream();
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        Client client = new Client("localhost", 1234);
 
-        registerDummyUser(in, out);
-        loginDummyUser(in, out);
-        loginDummyUser(in, out);
-        socket.close();
+        Path imagePath = Paths.get("/Users/moussa/Desktop/Fall 2021/CSC430/Project/LAU-CSC430-Final-Project/rona-client/src/main/java/com/haidousm/rona/client/profile-pic.png");
+        Request registerUserRequest = UserController.prepareRegisterUser("Moussa", "Haidous", "moussa.haidous@lau.edu", "haidousm", "123456", false, Path.of(""), imagePath);
+        client.send(registerUserRequest);
+        RegisteredUserResponse registeredUserResponse = new Gson().fromJson(client.receive(), RegisteredUserResponse.class);
+        System.out.println(registeredUserResponse);
     }
 
     public static void registerDummyUser(InputStream in, PrintWriter out) throws IOException {

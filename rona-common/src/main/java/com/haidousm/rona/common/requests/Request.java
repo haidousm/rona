@@ -23,11 +23,20 @@ public class Request {
 
     }
 
+    public Request(Method method, String body) {
+        this.method = method;
+        this.body = body;
+    }
+
     public Method getMethod() {
         return method;
     }
 
     public String getBody() {
         return body;
+    }
+
+    public String toString() {
+        return method.toString() + ";;" + body;
     }
 }

@@ -5,7 +5,7 @@ import com.haidousm.rona.server.entity.User;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.requests.UserDetailsRequest;
-import com.haidousm.rona.server.response.Response;
+import com.haidousm.rona.common.responses.Response;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Transaction;
 

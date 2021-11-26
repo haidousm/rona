@@ -3,7 +3,7 @@ package com.haidousm.rona.server.handlers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.server.response.Response;
+import com.haidousm.rona.common.responses.Response;
 import com.haidousm.rona.common.enums.Status;
 
 import java.io.*;
