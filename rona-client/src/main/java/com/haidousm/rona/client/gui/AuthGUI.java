@@ -16,7 +16,7 @@ public class AuthGUI extends JFrame {
     private JPasswordField passwordTextField;
     private JButton loginButton;
     private JButton registerButton;
-    private JPanel mainPane;
+    private JPanel mainPanel;
     private JButton uploadImageButton;
     private JCheckBox isVaccinatedCheckbox;
     private JButton uploadPDFButton;
@@ -31,7 +31,7 @@ public class AuthGUI extends JFrame {
 
     public AuthGUI(String title, Client client) {
         super(title);
-        setContentPane(mainPane);
+        setContentPane(mainPanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
 

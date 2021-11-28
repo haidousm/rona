@@ -3,7 +3,7 @@ package com.haidousm.rona.common.requests;
 import com.google.gson.Gson;
 import com.haidousm.rona.common.requests.builders.LoginRequestBuilder;
 import com.haidousm.rona.common.requests.builders.RegisterRequestBuilder;
-import com.haidousm.rona.common.requests.builders.CurrentUserRequestBuilder;
+import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.requests.builders.UserDetailsRequestBuilder;
 import com.haidousm.rona.common.enums.Method;
 
@@ -44,10 +44,11 @@ public class RequestFactory {
                 return LoginRequestBuilder.builder().build(requestBody);
             case REGISTER:
                 return RegisterRequestBuilder.builder().build(requestBody);
-            case GET_USER:
+            case GET_USER_BY:
                 return UserDetailsRequestBuilder.builder().build(requestBody);
-            case GET_CURRENT_USER:
-                return CurrentUserRequestBuilder.builder().build(requestBody);
+            case GET_USER:
+            case GET_HEALTH_STATUS:
+                return AuthorizedRequestBuilder.builder().setMethod(requestMethod).build(requestBody);
             default:
                 throw new IllegalArgumentException("Invalid request type: " + requestMethod);
         }

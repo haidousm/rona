@@ -1,7 +1,7 @@
 package com.haidousm.rona.server.handlers;
 
 import com.google.gson.Gson;
-import com.haidousm.rona.common.requests.CurrentUserRequest;
+import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.Request;
@@ -13,7 +13,7 @@ import org.hibernate.Transaction;
 
 import java.util.List;
 
-public class UserDetailsHandler {
+public class UserHandler {
 
     public static GenericResponse handleGetUserDetails(Request request) {
         GenericResponse genericResponse = new GenericResponse();
@@ -75,17 +75,17 @@ public class UserDetailsHandler {
     public static GenericResponse handleGetCurrentUserDetails(Request request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = getCurrentUserDetails((CurrentUserRequest) request);
+            genericResponse = getCurrentUserDetails((AuthorizedRequest) request);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
         return genericResponse;
     }
 
-    private static GenericResponse getCurrentUserDetails(CurrentUserRequest currentUserRequest) {
+    private static GenericResponse getCurrentUserDetails(AuthorizedRequest authorizedRequest) {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
-        String token = currentUserRequest.getToken();
+        String token = authorizedRequest.getToken();
         Transaction tx = HibernateUtil.beginTransaction();
         UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         tx.commit();

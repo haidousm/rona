@@ -2,10 +2,12 @@ package com.haidousm.rona.common.requests;
 
 import com.haidousm.rona.common.enums.Method;
 
-public class CurrentUserRequest extends GenericRequest {
+public class AuthorizedRequest extends GenericRequest {
+    private Method method;
     private String token;
 
-    public CurrentUserRequest(String token) {
+    public AuthorizedRequest(Method method, String token) {
+        this.method = method;
         this.token = token;
     }
 
@@ -15,7 +17,7 @@ public class CurrentUserRequest extends GenericRequest {
 
     @Override
     public Method getMethod() {
-        return Method.GET_CURRENT_USER;
+        return method;
     }
 
 }

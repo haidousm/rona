@@ -32,6 +32,6 @@ public class UserDetailsRequest extends GenericRequest {
 
     @Override
     public Method getMethod() {
-        return Method.GET_USER;
+        return Method.GET_USER_BY;
     }
 }

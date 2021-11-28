@@ -10,7 +10,7 @@ import java.net.Socket;
 public class Server {
 
     private ServerSocket serverSocket;
-    private int port;
+    private final int port;
 
     public Server(int port) {
         this.port = port;

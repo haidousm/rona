@@ -1,9 +1,10 @@
 package com.haidousm.rona.client.controllers;
 
+import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.requests.builders.LoginRequestBuilder;
 import com.haidousm.rona.common.requests.builders.RegisterRequestBuilder;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.builders.CurrentUserRequestBuilder;
+import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.utils.MiscUtils;
 
 import java.nio.file.Path;
@@ -33,6 +34,6 @@ public class UserController {
     }
 
     public static Request prepareGetCurrentUser(String token) {
-        return CurrentUserRequestBuilder.builder().setToken(token).build();
+        return AuthorizedRequestBuilder.builder().setMethod(Method.GET_USER).setToken(token).build();
     }
 }

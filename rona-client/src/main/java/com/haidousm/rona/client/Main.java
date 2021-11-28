@@ -8,7 +8,7 @@ import javax.swing.*;
 public class Main {
 
     public static void main(String[] args) {
-        JFrame connectServerGUI = new ConnectServerGUI("Rona", 500, 500);
+        JFrame connectServerGUI = new ConnectServerGUI("Rona");
         connectServerGUI.setVisible(true);
     }
 }

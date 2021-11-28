@@ -12,7 +12,7 @@ public class ConnectServerGUI extends JFrame {
     private JTextField portNumberTextField;
     private JButton connectButton;
 
-    public ConnectServerGUI(String title, int width, int height) {
+    public ConnectServerGUI(String title) {
         super(title);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(mainPanel);
