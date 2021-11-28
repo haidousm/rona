@@ -25,6 +25,8 @@ public class HomeGUI extends JFrame {
     private JButton declareHealthStatusButton;
     private JTable statsTable;
     private JButton friendsAndFamilyButton;
+    private JButton logOutButton;
+    private JButton addTrustedMemberButton;
 
     private final Client client;
     private final String authToken;
@@ -35,7 +37,7 @@ public class HomeGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setContentPane(mainPane);
         pack();
-
+        setLocationRelativeTo(null);
         this.client = client;
         this.authToken = authResponse.getToken();
 
@@ -45,6 +47,10 @@ public class HomeGUI extends JFrame {
 
         declareHealthStatusButton.addActionListener(e -> {
             handleDeclareHealthStatusClicked();
+        });
+
+        logOutButton.addActionListener(e -> {
+            handleLogoutClicked();
         });
 
     }
@@ -129,5 +135,15 @@ public class HomeGUI extends JFrame {
         }
 
         setupStatsTable();
+    }
+
+    private void handleLogoutClicked() {
+        this.dispose();
+        new AuthGUI("Rona", client).setVisible(true);
+    }
+
+    @Override
+    public Insets getInsets() {
+        return new Insets(50, 25, 25, 50);
     }
 }

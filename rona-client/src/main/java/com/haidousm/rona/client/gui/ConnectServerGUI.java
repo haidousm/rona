@@ -3,6 +3,7 @@ package com.haidousm.rona.client.gui;
 import com.haidousm.rona.client.client.Client;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 
 public class ConnectServerGUI extends JFrame {
@@ -17,6 +18,7 @@ public class ConnectServerGUI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(mainPanel);
         this.pack();
+        setLocationRelativeTo(null);
 
         connectButton.addActionListener(e -> {
             String ipAddress = ipAddressTextField.getText();
@@ -41,5 +43,8 @@ public class ConnectServerGUI extends JFrame {
         });
     }
 
-
+    @Override
+    public Insets getInsets() {
+        return new Insets(10, 10, 10, 10);
+    }
 }

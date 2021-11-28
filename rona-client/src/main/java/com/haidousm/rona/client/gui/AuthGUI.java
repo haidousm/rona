@@ -8,6 +8,7 @@ import com.haidousm.rona.common.responses.AuthResponse;
 import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 
 import javax.swing.*;
+import java.awt.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -36,6 +37,8 @@ public class AuthGUI extends JFrame {
         setContentPane(mainPanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
+
+        setLocationRelativeTo(null);
 
         this.client = client;
 
@@ -115,5 +118,9 @@ public class AuthGUI extends JFrame {
         homeGUI.setVisible(true);
     }
 
+    @Override
+    public Insets getInsets() {
+        return new Insets(10, 10, 10, 10);
+    }
 
 }
