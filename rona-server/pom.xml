@@ -35,6 +35,12 @@
             <artifactId>gson</artifactId>
             <version>2.8.5</version>
         </dependency>
+        <dependency>
+            <groupId>com.haidousm</groupId>
+            <artifactId>rona-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,7 +52,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.haidousm.rona.com.haidousm.rona.Main</mainClass>
+                            <mainClass>com.haidousm.rona.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
