@@ -1,4 +1,4 @@
-package com.haidousm.rona.server.entity;
+package com.haidousm.rona.common.entity;
 
 import com.google.gson.annotations.Expose;
 

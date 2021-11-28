@@ -57,6 +57,9 @@ public class ClientHandler implements Runnable {
             case REGISTER:
                 genericResponse = RegisterHandler.handleRegister(request);
                 break;
+            case GET_CURRENT_USER:
+                genericResponse = UserDetailsHandler.handleGetCurrentUserDetails(request);
+                break;
             case GET_USER:
                 genericResponse = UserDetailsHandler.handleGetUserDetails(request);
                 break;

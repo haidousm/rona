@@ -1,20 +1,19 @@
-package com.haidousm.rona.server.entity;
+package com.haidousm.rona.common.entity;
+
+import com.haidousm.rona.common.enums.Health;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "location_details")
-public class LocationDetails {
+@Table(name = "health_status")
+public class HealthStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
-    @Column(name = "latitude")
-    private double latitude;
-
-    @Column(name = "longitude")
-    private double longitude;
+    @Column(name = "status")
+    private Health status;
 
     @Column(name = "timestamp")
     private long timestamp;
@@ -23,12 +22,11 @@ public class LocationDetails {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public LocationDetails() {
+    public HealthStatus() {
     }
 
-    public LocationDetails(double latitude, double longitude, long timestamp, User user) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public HealthStatus(Health status, long timestamp, User user) {
+        this.status = status;
         this.timestamp = timestamp;
         this.user = user;
     }
@@ -37,12 +35,8 @@ public class LocationDetails {
         return id;
     }
 
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
+    public Health getStatus() {
+        return status;
     }
 
     public long getTimestamp() {
@@ -55,10 +49,9 @@ public class LocationDetails {
 
     @Override
     public String toString() {
-        return "LocationDetails{" +
+        return "HealthStatus{" +
                 "id=" + id +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
+                ", status=" + status +
                 ", timestamp=" + timestamp +
                 ", user_id=" + user.getId() +
                 '}';

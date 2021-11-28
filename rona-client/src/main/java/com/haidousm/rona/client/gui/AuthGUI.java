@@ -3,15 +3,9 @@ package com.haidousm.rona.client.gui;
 import com.haidousm.rona.client.client.Client;
 import com.haidousm.rona.client.controllers.UserController;
 import com.haidousm.rona.common.enums.Status;
-import com.haidousm.rona.common.requests.LoginRequest;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.RequestFactory;
-import com.haidousm.rona.common.requests.builders.LoginRequestBuilder;
-import com.haidousm.rona.common.responses.LoginResponse;
-import com.haidousm.rona.common.responses.RegisterResponse;
-import com.haidousm.rona.common.responses.builders.LoginResponseBuilder;
-import com.haidousm.rona.common.responses.builders.RegisterResponseBuilder;
-import com.haidousm.rona.common.utils.MiscUtils;
+import com.haidousm.rona.common.responses.AuthResponse;
+import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 
 import javax.swing.*;
 import java.nio.file.Path;
@@ -54,9 +48,9 @@ public class AuthGUI extends JFrame {
             String password = new String(passwordTextField.getPassword());
             Request request = UserController.prepareLogin(username, password);
             client.send(request);
-            LoginResponse response = LoginResponseBuilder.builder().build(client.receive());
+            AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
             if (response.getStatus() == Status.SUCCESS) {
-                System.out.println("Login success");
+                goToHome(client, response);
             } else {
                 JOptionPane.showMessageDialog(this, "Login failed");
             }
@@ -93,14 +87,20 @@ public class AuthGUI extends JFrame {
             boolean isVaccinated = isVaccinatedCheckbox.isSelected();
             Request request = UserController.prepareRegisterUser(firstName, lastName, email, username, password, isVaccinated, pdfFilePath, imageFilePath);
             client.send(request);
-            RegisterResponse response = RegisterResponseBuilder.builder().build(client.receive());
+            AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
             if (response.getStatus() == Status.SUCCESS) {
-                System.out.println("Register success");
+                goToHome(client, response);
             } else {
                 JOptionPane.showMessageDialog(this, "Register failed");
             }
         });
 
+    }
+
+    private void goToHome(Client client, AuthResponse response) {
+        dispose();
+        HomeGUI homeGUI = new HomeGUI("Home", client, response);
+        homeGUI.setVisible(true);
     }
 
 

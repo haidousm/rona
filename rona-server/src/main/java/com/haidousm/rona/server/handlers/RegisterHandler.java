@@ -1,13 +1,14 @@
 package com.haidousm.rona.server.handlers;
 
 import com.google.gson.Gson;
-import com.haidousm.rona.common.responses.RegisterResponse;
-import com.haidousm.rona.common.responses.builders.RegisterResponseBuilder;
-import com.haidousm.rona.server.entity.User;
+import com.haidousm.rona.common.responses.AuthResponse;
+import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
+import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.RegisterRequest;
+import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import com.haidousm.rona.common.utils.MiscUtils;
 import org.hibernate.Transaction;
@@ -19,26 +20,26 @@ public class RegisterHandler {
     public static GenericResponse handleRegister(Request request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            RegisterResponse registerResponse = register((RegisterRequest) request);
-            genericResponse.setStatus(registerResponse.getStatus());
-            genericResponse.setResponse(new Gson().toJson(registerResponse));
+            AuthResponse authResponse = register((RegisterRequest) request);
+            genericResponse.setStatus(authResponse.getStatus());
+            genericResponse.setResponse(new Gson().toJson(authResponse));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
         return genericResponse;
     }
 
-    private static RegisterResponse register(RegisterRequest registerRequest) {
-        RegisterResponse registerResponse = RegisterResponseBuilder.builder().build();
+    private static AuthResponse register(RegisterRequest registerRequest) {
+        AuthResponse authResponse = AuthResponseBuilder.builder().build();
 
         if (registerRequest.getImageFile().isEmpty()) {
-            registerResponse.setStatus(Status.BAD_REQUEST);
-            return registerResponse;
+            authResponse.setStatus(Status.BAD_REQUEST);
+            return authResponse;
         }
 
         if (registerRequest.isVaccinated() && registerRequest.getVaccineCertificateFile().isEmpty()) {
-            registerResponse.setStatus(Status.BAD_REQUEST);
-            return registerResponse;
+            authResponse.setStatus(Status.BAD_REQUEST);
+            return authResponse;
         }
 
         Path imageFilePath = Paths.get("user-data", "user-images", registerRequest.getUsername() + ".jpg");
@@ -56,13 +57,19 @@ public class RegisterHandler {
             HibernateUtil.getSession().save(newUser);
             tx.commit();
 
-            registerResponse = RegisterResponseBuilder.builder().setUserID(newUser.getId()).build();
-            registerResponse.setStatus(Status.SUCCESS);
+            tx = HibernateUtil.beginTransaction();
+            String token = LoginHandler.generateAuthToken(32);
+            long expiryTimestamp = System.currentTimeMillis() + 604800000;
+            UserAuthToken userAuthToken = new UserAuthToken(token, expiryTimestamp, newUser);
+            HibernateUtil.getSession().save(userAuthToken);
+            tx.commit();
+            authResponse = AuthResponseBuilder.builder().setToken(token).setExpiryTimestamp(expiryTimestamp).build();
+            authResponse.setStatus(Status.SUCCESS);
         } catch (Exception e) {
             e.printStackTrace();
-            registerResponse.setStatus(Status.BAD_REQUEST);
+            authResponse.setStatus(Status.BAD_REQUEST);
         }
 
-        return registerResponse;
+        return authResponse;
     }
 }

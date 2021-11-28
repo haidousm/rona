@@ -15,7 +15,6 @@ public class ConnectServerGUI extends JFrame {
     public ConnectServerGUI(String title, int width, int height) {
         super(title);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        this.setPreferredSize(new java.awt.Dimension(width, height));
         this.setContentPane(mainPanel);
         this.pack();
 

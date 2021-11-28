@@ -4,16 +4,22 @@ import com.google.gson.GsonBuilder;
 import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.enums.Status;
 
-public class RegisterResponse implements Response {
+public class AuthResponse implements Response {
     private Status status;
-    private final int userID;
+    private final String token;
+    private final long expiryTimestamp;
 
-    public RegisterResponse(int userID) {
-        this.userID = userID;
+    public AuthResponse(String token, long expiryTimestamp) {
+        this.token = token;
+        this.expiryTimestamp = expiryTimestamp;
     }
 
-    public int getUserID() {
-        return userID;
+    public String getToken() {
+        return token;
+    }
+
+    public long getExpiryTimestamp() {
+        return expiryTimestamp;
     }
 
     @Override
@@ -33,6 +39,6 @@ public class RegisterResponse implements Response {
 
     @Override
     public Method getMethod() {
-        return Method.REGISTER;
+        return Method.LOGIN;
     }
 }
