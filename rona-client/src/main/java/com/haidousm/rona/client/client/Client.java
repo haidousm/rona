@@ -17,16 +17,13 @@ public class Client {
     private String ip;
     private int port;
 
-    public Client(String ip, int port) {
+    public Client(String ip, int port) throws IOException {
         this.ip = ip;
         this.port = port;
-        try {
-            socket = new Socket(ip, port);
-            in = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        socket = new Socket(ip, port);
+        in = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
+        out = new PrintWriter(socket.getOutputStream(), true);
+
     }
 
     public void send(Request request) {

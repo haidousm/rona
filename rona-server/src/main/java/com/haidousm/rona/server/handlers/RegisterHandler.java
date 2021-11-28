@@ -30,7 +30,6 @@ public class RegisterHandler {
 
     private static RegisterResponse register(RegisterRequest registerRequest) {
         RegisterResponse registerResponse = RegisterResponseBuilder.builder().build();
-        registerResponse.setStatus(Status.SUCCESS);
 
         if (registerRequest.getImageFile().isEmpty()) {
             registerResponse.setStatus(Status.BAD_REQUEST);
@@ -58,7 +57,7 @@ public class RegisterHandler {
             tx.commit();
 
             registerResponse = RegisterResponseBuilder.builder().setUserID(newUser.getId()).build();
-
+            registerResponse.setStatus(Status.SUCCESS);
         } catch (Exception e) {
             e.printStackTrace();
             registerResponse.setStatus(Status.BAD_REQUEST);

@@ -28,7 +28,6 @@ public class LoginHandler {
 
     private static LoginResponse login(LoginRequest loginRequest) {
         LoginResponse loginResponse = LoginResponseBuilder.builder().build();
-        loginResponse.setStatus(Status.SUCCESS);
 
         Transaction tx;
         tx = HibernateUtil.beginTransaction();
