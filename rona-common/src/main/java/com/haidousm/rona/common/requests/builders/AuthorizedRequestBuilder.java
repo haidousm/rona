@@ -5,8 +5,9 @@ import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
 
 public class AuthorizedRequestBuilder {
-    private String token;
     private Method method;
+    private String token;
+    private String body;
 
     public AuthorizedRequestBuilder setToken(String token) {
         this.token = token;
@@ -18,12 +19,17 @@ public class AuthorizedRequestBuilder {
         return this;
     }
 
-    public AuthorizedRequest build() {
-        return new AuthorizedRequest(method, token);
+    public AuthorizedRequestBuilder setBody(String body) {
+        this.body = body;
+        return this;
     }
 
-    public AuthorizedRequest build(String body) {
-        return new Gson().fromJson(body, AuthorizedRequest.class);
+    public AuthorizedRequest build() {
+        return new AuthorizedRequest(method, token, body);
+    }
+
+    public AuthorizedRequest build(String json) {
+        return new Gson().fromJson(json, AuthorizedRequest.class);
     }
 
     public static AuthorizedRequestBuilder builder() {

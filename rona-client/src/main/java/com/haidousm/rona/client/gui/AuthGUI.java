@@ -29,11 +29,15 @@ public class AuthGUI extends JFrame {
     private Path imageFilePath = Paths.get("");
     private Path pdfFilePath = Paths.get("");
 
+    private final Client client;
+
     public AuthGUI(String title, Client client) {
         super(title);
         setContentPane(mainPanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
+
+        this.client = client;
 
         isVaccinatedCheckbox.addActionListener(e -> {
             if (isVaccinatedCheckbox.isSelected()) {
@@ -44,16 +48,11 @@ public class AuthGUI extends JFrame {
         });
 
         loginButton.addActionListener(e -> {
-            String username = usernameTextField.getText();
-            String password = new String(passwordTextField.getPassword());
-            Request request = UserController.prepareLogin(username, password);
-            client.send(request);
-            AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
-            if (response.getStatus() == Status.SUCCESS) {
-                goToHome(client, response);
-            } else {
-                JOptionPane.showMessageDialog(this, "Login failed");
-            }
+            loginClicked();
+        });
+
+        registerButton.addActionListener(e -> {
+            registerClicked();
         });
 
         uploadImageButton.addActionListener(e -> {
@@ -78,23 +77,36 @@ public class AuthGUI extends JFrame {
             }
         });
 
-        registerButton.addActionListener(e -> {
-            String username = registerUsernameTextField.getText();
-            String password = new String(registerPasswordTextField.getPassword());
-            String email = emailTextField.getText();
-            String firstName = firstNameTextField.getText();
-            String lastName = lastNameTextField.getText();
-            boolean isVaccinated = isVaccinatedCheckbox.isSelected();
-            Request request = UserController.prepareRegisterUser(firstName, lastName, email, username, password, isVaccinated, pdfFilePath, imageFilePath);
-            client.send(request);
-            AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
-            if (response.getStatus() == Status.SUCCESS) {
-                goToHome(client, response);
-            } else {
-                JOptionPane.showMessageDialog(this, "Register failed");
-            }
-        });
+    }
 
+    private void loginClicked() {
+        String username = usernameTextField.getText();
+        String password = new String(passwordTextField.getPassword());
+        Request request = UserController.prepareLogin(username, password);
+        client.send(request);
+        AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
+        if (response.getStatus() == Status.SUCCESS) {
+            goToHome(client, response);
+        } else {
+            JOptionPane.showMessageDialog(this, "Login failed");
+        }
+    }
+
+    private void registerClicked() {
+        String username = registerUsernameTextField.getText();
+        String password = new String(registerPasswordTextField.getPassword());
+        String email = emailTextField.getText();
+        String firstName = firstNameTextField.getText();
+        String lastName = lastNameTextField.getText();
+        boolean isVaccinated = isVaccinatedCheckbox.isSelected();
+        Request request = UserController.prepareRegisterUser(firstName, lastName, email, username, password, isVaccinated, pdfFilePath, imageFilePath);
+        client.send(request);
+        AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
+        if (response.getStatus() == Status.SUCCESS) {
+            goToHome(client, response);
+        } else {
+            JOptionPane.showMessageDialog(this, "Register failed");
+        }
     }
 
     private void goToHome(Client client, AuthResponse response) {

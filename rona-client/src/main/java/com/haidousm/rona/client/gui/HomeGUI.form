@@ -24,9 +24,9 @@
           <text value="Status: "/>
         </properties>
       </component>
-      <component id="cdef3" class="javax.swing.JButton" binding="declareInfectionButton">
+      <component id="cdef3" class="javax.swing.JButton" binding="declareHealthStatusButton">
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <background color="-64000"/>
@@ -39,14 +39,6 @@
           <text value="I'm POSITIVE!"/>
         </properties>
       </component>
-      <component id="d21ae" class="javax.swing.JTable" binding="statsTable">
-        <constraints>
-          <grid row="2" column="1" row-span="3" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="50"/>
-          </grid>
-        </constraints>
-        <properties/>
-      </component>
       <component id="42f7d" class="javax.swing.JButton" binding="friendsAndFamilyButton" default-binding="true">
         <constraints>
           <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -55,6 +47,19 @@
           <text value="Friends and Family"/>
         </properties>
       </component>
+      <scrollpane id="6a071">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="d21ae" class="javax.swing.JTable" binding="statsTable">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
     </children>
   </grid>
 </form>

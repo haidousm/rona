@@ -39,6 +39,11 @@ public class HealthStatus {
         return status;
     }
 
+    public void setStatus(Health status) {
+        this.status = status;
+        this.timestamp = System.currentTimeMillis();
+    }
+
     public long getTimestamp() {
         return timestamp;
     }

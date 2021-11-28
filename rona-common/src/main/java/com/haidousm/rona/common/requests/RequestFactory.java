@@ -48,6 +48,8 @@ public class RequestFactory {
                 return UserDetailsRequestBuilder.builder().build(requestBody);
             case GET_USER:
             case GET_HEALTH_STATUS:
+            case UPDATE_HEALTH_STATUS:
+            case GET_STATS:
                 return AuthorizedRequestBuilder.builder().setMethod(requestMethod).build(requestBody);
             default:
                 throw new IllegalArgumentException("Invalid request type: " + requestMethod);

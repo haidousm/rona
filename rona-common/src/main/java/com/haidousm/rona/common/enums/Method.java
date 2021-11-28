@@ -7,6 +7,8 @@ public enum Method {
     GET_USER_BY("GET_USER_BY"),
     GET_ALL_USERS("GET_ALL_USERS"),
     GET_HEALTH_STATUS("GET_USER_STATUS"),
+    UPDATE_HEALTH_STATUS("UPDATE_USER_STATUS"),
+    GET_STATS("GET_STATS"),
     UNDEFINED("UNDEFINED");
 
     private String method;

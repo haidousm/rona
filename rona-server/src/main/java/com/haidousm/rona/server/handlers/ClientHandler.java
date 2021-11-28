@@ -62,14 +62,20 @@ public class ClientHandler implements Runnable {
             case GET_USER:
                 genericResponse = UserHandler.handleGetCurrentUserDetails(request);
                 break;
-            case GET_HEALTH_STATUS:
-                genericResponse = HealthStatusHandler.handleGetCurrentUserHealthStatus(request);
-                break;
             case GET_USER_BY:
                 genericResponse = UserHandler.handleGetUserDetails(request);
                 break;
             case GET_ALL_USERS:
                 genericResponse = UserHandler.handleGetAllUserDetails();
+                break;
+            case GET_HEALTH_STATUS:
+                genericResponse = HealthStatusHandler.handleGetCurrentUserHealthStatus(request);
+                break;
+            case UPDATE_HEALTH_STATUS:
+                genericResponse = HealthStatusHandler.handleUpdateCurrentUserHealthStatus(request);
+                break;
+            case GET_STATS:
+                genericResponse = StatsHandler.handleGetStats(request);
                 break;
             default:
                 genericResponse = new GenericResponse();
