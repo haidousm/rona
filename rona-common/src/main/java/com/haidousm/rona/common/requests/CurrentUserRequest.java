@@ -2,7 +2,7 @@ package com.haidousm.rona.common.requests;
 
 import com.haidousm.rona.common.enums.Method;
 
-public class CurrentUserRequest implements Request {
+public class CurrentUserRequest extends GenericRequest {
     private String token;
 
     public CurrentUserRequest(String token) {

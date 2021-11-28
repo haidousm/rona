@@ -12,6 +12,10 @@ import javax.swing.*;
 public class HomeGUI extends JFrame {
     private JLabel welcomeNameLabel;
     private JPanel mainPanel;
+    private JLabel statusLabel;
+    private JButton declareInfectionButton;
+    private JTable statsTable;
+    private JButton friendsAndFamilyButton;
 
     public HomeGUI(String name, Client client, AuthResponse authResponse) {
         super(name);
@@ -22,5 +26,6 @@ public class HomeGUI extends JFrame {
         client.send(getCurrentUserRequest);
         User currentUser = UserResponseBuilder.builder().build(client.receive());
         welcomeNameLabel.setText("Welcome " + currentUser.getFirstName() + " " + currentUser.getLastName());
+//        statusLabel.setText("Status: " + currentUser);
     }
 }

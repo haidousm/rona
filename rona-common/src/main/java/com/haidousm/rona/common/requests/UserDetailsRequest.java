@@ -3,7 +3,7 @@ package com.haidousm.rona.common.requests;
 import com.haidousm.rona.common.enums.Method;
 import com.sun.istack.Nullable;
 
-public class UserDetailsRequest implements Request {
+public class UserDetailsRequest extends GenericRequest {
 
     @Nullable
     private int ID;
@@ -30,6 +30,7 @@ public class UserDetailsRequest implements Request {
         return username;
     }
 
+    @Override
     public Method getMethod() {
         return Method.GET_USER;
     }

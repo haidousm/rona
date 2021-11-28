@@ -30,6 +30,8 @@ public class ClientHandler implements Runnable {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 Request request = RequestFactory.createRequest(line);
+                request.setIPAddress(socket.getInetAddress().getHostAddress());
+                request.setPort(socket.getPort());
                 GenericResponse genericResponse = handleRequest(request);
                 bufferedWriter.write(genericResponse.toString());
                 bufferedWriter.newLine();

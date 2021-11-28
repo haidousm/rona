@@ -1,6 +1,7 @@
 package com.haidousm.rona.server.handlers;
 
 import com.google.gson.GsonBuilder;
+import com.haidousm.rona.common.entity.ConnectionDetails;
 import com.haidousm.rona.common.responses.AuthResponse;
 import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 import com.haidousm.rona.common.entity.User;
@@ -53,8 +54,9 @@ public class LoginHandler {
                 userAuthToken.setToken(token);
                 userAuthToken.setExpiryTimestamp(expiryTimestamp);
             }
-
+            ConnectionDetails connectionDetails = new ConnectionDetails(loginRequest.getIPAddress(), loginRequest.getPort(), user);
             HibernateUtil.getSession().save(userAuthToken);
+            HibernateUtil.getSession().saveOrUpdate(connectionDetails);
             tx.commit();
             authResponse = AuthResponseBuilder.builder().setToken(token).setExpiryTimestamp(expiryTimestamp).build();
             authResponse.setStatus(Status.SUCCESS);

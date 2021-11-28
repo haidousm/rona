@@ -2,7 +2,7 @@ package com.haidousm.rona.common.requests;
 
 import com.haidousm.rona.common.enums.Method;
 
-public class RegisterRequest implements Request {
+public class RegisterRequest extends GenericRequest {
     private String firstname;
     private String lastname;
     private String email;
@@ -55,6 +55,7 @@ public class RegisterRequest implements Request {
         return imageFile;
     }
 
+    @Override
     public Method getMethod() {
         return Method.REGISTER;
     }

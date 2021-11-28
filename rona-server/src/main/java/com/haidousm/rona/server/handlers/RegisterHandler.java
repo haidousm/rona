@@ -1,6 +1,9 @@
 package com.haidousm.rona.server.handlers;
 
 import com.google.gson.Gson;
+import com.haidousm.rona.common.entity.ConnectionDetails;
+import com.haidousm.rona.common.entity.HealthStatus;
+import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.responses.AuthResponse;
 import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 import com.haidousm.rona.common.entity.User;
@@ -57,11 +60,18 @@ public class RegisterHandler {
             HibernateUtil.getSession().save(newUser);
             tx.commit();
 
-            tx = HibernateUtil.beginTransaction();
+
             String token = LoginHandler.generateAuthToken(32);
             long expiryTimestamp = System.currentTimeMillis() + 604800000;
+
+            tx = HibernateUtil.beginTransaction();
+
+            HealthStatus healthStatus = new HealthStatus(Health.SAFE, System.currentTimeMillis(), newUser);
+            ConnectionDetails connectionDetails = new ConnectionDetails(registerRequest.getIPAddress(), registerRequest.getPort(), newUser);
             UserAuthToken userAuthToken = new UserAuthToken(token, expiryTimestamp, newUser);
             HibernateUtil.getSession().save(userAuthToken);
+            HibernateUtil.getSession().save(healthStatus);
+            HibernateUtil.getSession().save(connectionDetails);
             tx.commit();
             authResponse = AuthResponseBuilder.builder().setToken(token).setExpiryTimestamp(expiryTimestamp).build();
             authResponse.setStatus(Status.SUCCESS);

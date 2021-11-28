@@ -24,11 +24,9 @@ public class RequestFactory {
     }
 
     public static String createRequestString(Request request) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(request.getMethod().getMethod());
-        builder.append(";;");
-        builder.append(new Gson().toJson(request));
-        return builder.toString();
+        return request.getMethod().getMethod() +
+                ";;" +
+                new Gson().toJson(request);
     }
 
     private static Request handleNoBodyRequest(Method requestMethod) {
