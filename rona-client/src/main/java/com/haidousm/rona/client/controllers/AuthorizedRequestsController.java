@@ -7,7 +7,7 @@ import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 
-public class HealthStatusController {
+public class AuthorizedRequestsController {
     public static Request prepareGetHealthStatusRequest(String token) {
         return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.GET_HEALTH_STATUS).build();
     }
@@ -16,5 +16,13 @@ public class HealthStatusController {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("status", healthStatus.name());
         return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.UPDATE_HEALTH_STATUS).setBody(new Gson().toJson(jsonObject)).build();
+    }
+
+    public static Request prepareGetStatsRequest(String token) {
+        return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.GET_STATS).build();
+    }
+
+    public static Request prepareGetTrustedUsersRequest(String token) {
+        return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.GET_TRUSTED_USERS).build();
     }
 }

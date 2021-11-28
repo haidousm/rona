@@ -62,7 +62,7 @@ public class ClientHandler implements Runnable {
             case GET_USER:
                 genericResponse = UserHandler.handleGetCurrentUserDetails(request);
                 break;
-            case GET_USER_BY:
+            case FIND_USER_BY_USERNAME:
                 genericResponse = UserHandler.handleGetUserDetails(request);
                 break;
             case GET_ALL_USERS:
@@ -76,6 +76,12 @@ public class ClientHandler implements Runnable {
                 break;
             case GET_STATS:
                 genericResponse = StatsHandler.handleGetStats(request);
+                break;
+            case GET_TRUSTED_USERS:
+                genericResponse = TrustedUsersHandler.handleGetTrustedUsers(request);
+                break;
+            case ADD_TRUSTED_USER:
+                genericResponse = TrustedUsersHandler.handleAddTrustedUser(request);
                 break;
             default:
                 genericResponse = new GenericResponse();

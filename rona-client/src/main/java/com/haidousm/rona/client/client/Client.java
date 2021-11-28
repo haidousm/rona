@@ -17,6 +17,8 @@ public class Client {
     private String ip;
     private int port;
 
+    private String token = "";
+
     public Client(String ip, int port) throws IOException {
         this.ip = ip;
         this.port = port;
@@ -46,5 +48,13 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

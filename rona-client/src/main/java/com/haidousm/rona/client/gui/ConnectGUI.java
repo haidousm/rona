@@ -6,14 +6,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
-public class ConnectServerGUI extends JFrame {
+public class ConnectGUI extends JFrame {
     private JLabel welcomeMessage;
     private JPanel mainPanel;
     private JTextField ipAddressTextField;
     private JTextField portNumberTextField;
     private JButton connectButton;
 
-    public ConnectServerGUI(String title) {
+    public ConnectGUI(String title) {
         super(title);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(mainPanel);

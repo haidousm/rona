@@ -28,6 +28,7 @@
           </grid>
         </constraints>
         <properties>
+          <nextFocusableComponent value="3b0fc"/>
           <text value=""/>
         </properties>
       </component>
@@ -36,6 +37,7 @@
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <nextFocusableComponent value="aa450"/>
           <text value="Password"/>
         </properties>
       </component>
@@ -71,7 +73,9 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <nextFocusableComponent value="f1362"/>
+        </properties>
       </component>
       <component id="15fb4" class="javax.swing.JLabel">
         <constraints>
@@ -95,7 +99,9 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <nextFocusableComponent value="547b2"/>
+        </properties>
       </component>
       <component id="547b2" class="javax.swing.JLabel">
         <constraints>
@@ -111,7 +117,9 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <nextFocusableComponent value="4243"/>
+        </properties>
       </component>
       <component id="6b4f2" class="javax.swing.JLabel">
         <constraints>
@@ -127,7 +135,9 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <nextFocusableComponent value="7d4bd"/>
+        </properties>
       </component>
       <component id="92379" class="javax.swing.JButton" binding="loginButton" default-binding="true">
         <constraints>
@@ -208,7 +218,9 @@
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <nextFocusableComponent value="6b4f2"/>
+        </properties>
       </component>
     </children>
   </grid>

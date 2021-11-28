@@ -1,5 +1,6 @@
 package com.haidousm.rona.common.entity;
 
+import com.google.gson.annotations.Expose;
 import com.haidousm.rona.common.enums.Health;
 
 import javax.persistence.*;
@@ -10,12 +11,15 @@ public class HealthStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Expose
     private int id;
 
     @Column(name = "status")
+    @Expose
     private Health status;
 
     @Column(name = "timestamp")
+    @Expose
     private long timestamp;
 
     @OneToOne
