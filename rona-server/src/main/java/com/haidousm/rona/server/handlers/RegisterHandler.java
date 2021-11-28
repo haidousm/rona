@@ -2,6 +2,7 @@ package com.haidousm.rona.server.handlers;
 
 import com.google.gson.Gson;
 import com.haidousm.rona.common.responses.RegisterResponse;
+import com.haidousm.rona.common.responses.builders.RegisterResponseBuilder;
 import com.haidousm.rona.server.entity.User;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.responses.GenericResponse;
@@ -18,25 +19,27 @@ public class RegisterHandler {
     public static GenericResponse handleRegister(Request request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = register((RegisterRequest) request);
+            RegisterResponse registerResponse = register((RegisterRequest) request);
+            genericResponse.setStatus(registerResponse.getStatus());
+            genericResponse.setResponse(new Gson().toJson(registerResponse));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
         return genericResponse;
     }
 
-    private static GenericResponse register(RegisterRequest registerRequest) {
-        GenericResponse genericResponse = new GenericResponse();
-        genericResponse.setStatus(Status.SUCCESS);
+    private static RegisterResponse register(RegisterRequest registerRequest) {
+        RegisterResponse registerResponse = RegisterResponseBuilder.builder().build();
+        registerResponse.setStatus(Status.SUCCESS);
 
         if (registerRequest.getImageFile().isEmpty()) {
-            genericResponse.setStatus(Status.BAD_REQUEST);
-            return genericResponse;
+            registerResponse.setStatus(Status.BAD_REQUEST);
+            return registerResponse;
         }
 
         if (registerRequest.isVaccinated() && registerRequest.getVaccineCertificateFile().isEmpty()) {
-            genericResponse.setStatus(Status.BAD_REQUEST);
-            return genericResponse;
+            registerResponse.setStatus(Status.BAD_REQUEST);
+            return registerResponse;
         }
 
         Path imageFilePath = Paths.get("user-data", "user-images", registerRequest.getUsername() + ".jpg");
@@ -54,14 +57,13 @@ public class RegisterHandler {
             HibernateUtil.getSession().save(newUser);
             tx.commit();
 
-            RegisterResponse registerResponse = new RegisterResponse(newUser.getId());
-            genericResponse.setBody(new Gson().toJson(registerResponse));
+            registerResponse = RegisterResponseBuilder.builder().setUserID(newUser.getId()).build();
 
         } catch (Exception e) {
             e.printStackTrace();
-            genericResponse.setStatus(Status.BAD_REQUEST);
+            registerResponse.setStatus(Status.BAD_REQUEST);
         }
 
-        return genericResponse;
+        return registerResponse;
     }
 }

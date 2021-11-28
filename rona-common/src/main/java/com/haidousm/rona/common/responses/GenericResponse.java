@@ -6,15 +6,15 @@ import com.haidousm.rona.common.enums.Status;
 
 public class GenericResponse implements Response {
     private Status status;
-    private String body = "";
+    private String response = "";
 
     public GenericResponse() {
 
     }
 
-    public GenericResponse(Status status, String body) {
+    public GenericResponse(Status status, String response) {
         this.status = status;
-        this.body = body;
+        this.response = response;
     }
 
     public Status getStatus() {
@@ -30,12 +30,12 @@ public class GenericResponse implements Response {
         this.status = status;
     }
 
-    public String getBody() {
-        return body;
+    public String getResponse() {
+        return response;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setResponse(String response) {
+        this.response = response;
     }
 
     public String toString() {

@@ -30,5 +30,4 @@ public class UserController {
 
         return LoginRequestBuilder.builder().setUsername(username).setPassword(password).build();
     }
-
 }

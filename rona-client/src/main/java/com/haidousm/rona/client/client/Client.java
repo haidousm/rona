@@ -1,7 +1,9 @@
 package com.haidousm.rona.client.client;
 
+import com.google.gson.Gson;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.requests.RequestFactory;
+import com.haidousm.rona.common.responses.GenericResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,9 +34,9 @@ public class Client {
         out.flush();
     }
 
-    public String receive() {
+    public GenericResponse receive() {
         try {
-            return in.readLine();
+            return new Gson().fromJson(in.readLine(), GenericResponse.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

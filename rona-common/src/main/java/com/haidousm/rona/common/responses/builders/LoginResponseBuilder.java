@@ -23,7 +23,7 @@ public class LoginResponseBuilder {
     }
 
     public LoginResponse build(GenericResponse genericResponse) {
-        LoginResponse loginResponse = new Gson().fromJson(genericResponse.getBody(), LoginResponse.class);
+        LoginResponse loginResponse = new Gson().fromJson(genericResponse.getResponse(), LoginResponse.class);
         loginResponse.setStatus(genericResponse.getStatus());
         return loginResponse;
     }

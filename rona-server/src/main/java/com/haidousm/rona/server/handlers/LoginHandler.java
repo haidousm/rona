@@ -2,7 +2,6 @@ package com.haidousm.rona.server.handlers;
 
 import com.google.gson.GsonBuilder;
 import com.haidousm.rona.common.responses.LoginResponse;
-import com.haidousm.rona.common.responses.Response;
 import com.haidousm.rona.common.responses.builders.LoginResponseBuilder;
 import com.haidousm.rona.server.entity.User;
 import com.haidousm.rona.common.requests.LoginRequest;
@@ -20,7 +19,7 @@ public class LoginHandler {
         try {
             LoginResponse loginResponse = login((LoginRequest) request);
             genericResponse.setStatus(loginResponse.getStatus());
-            genericResponse.setBody(new GsonBuilder().create().toJson(loginResponse));
+            genericResponse.setResponse(new GsonBuilder().create().toJson(loginResponse));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }

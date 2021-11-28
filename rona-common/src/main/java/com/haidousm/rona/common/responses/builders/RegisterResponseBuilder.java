@@ -17,7 +17,7 @@ public class RegisterResponseBuilder {
     }
 
     public RegisterResponse build(GenericResponse response) {
-        RegisterResponse registerResponse = new Gson().fromJson(response.getBody(), RegisterResponse.class);
+        RegisterResponse registerResponse = new Gson().fromJson(response.getResponse(), RegisterResponse.class);
         registerResponse.setStatus(response.getStatus());
         return registerResponse;
     }
