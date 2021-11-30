@@ -158,4 +158,5 @@ public class HomeGUI extends JFrame {
     public Insets getInsets() {
         return new Insets(50, 25, 25, 50);
     }
+
 }

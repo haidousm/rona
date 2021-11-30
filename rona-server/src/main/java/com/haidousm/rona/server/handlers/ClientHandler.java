@@ -86,6 +86,9 @@ public class ClientHandler implements Runnable {
             case ADD_TRUSTED_USER:
                 genericResponse = TrustedUsersHandler.handleAddTrustedUser(request);
                 break;
+            case REMOVE_TRUSTED_USER:
+                genericResponse = TrustedUsersHandler.handleRemoveTrustedUser(request);
+                break;
             default:
                 genericResponse = new GenericResponse();
                 genericResponse.setStatus(Status.BAD_REQUEST);

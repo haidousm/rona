@@ -14,7 +14,10 @@ import com.haidousm.rona.common.responses.builders.UserResponseBuilder;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +57,11 @@ public class TrustedUsersListGUI extends JFrame {
         Request request = AuthorizedRequestBuilder.builder().setMethod(Method.GET_TRUSTED_USERS).setToken(client.getToken()).build();
         List<User> trustedUsers = UserResponseBuilder.builder().buildList(client.sendAndReceive(request));
         for (User user : trustedUsers) {
-            data.add(new Object[]{user.getUsername(), user.getFirstName(), user.getLastName(), user.getEmail(), new JButton("Remove")});
+            JButton removeButton = new JButton("Remove");
+            data.add(new Object[]{user.getUsername(), user.getFirstName(), user.getLastName(), user.getEmail(), removeButton});
+            removeButton.addActionListener(e -> {
+                handleRemoveTrustedUser(user);
+            });
         }
 
         trustedUsersTable.setModel(new DefaultTableModel(data.toArray(new Object[data.size()][]), columnNames));
@@ -67,6 +74,26 @@ public class TrustedUsersListGUI extends JFrame {
         trustedUsersTable.setColumnSelectionAllowed(false);
         trustedUsersTable.setCellSelectionEnabled(false);
         trustedUsersTable.setFocusable(false);
+
+        TableCellRenderer buttonRenderer = new JTableButtonRenderer();
+        trustedUsersTable.getColumn("").setCellRenderer(buttonRenderer);
+
+        trustedUsersTable.addMouseListener(new JTableButtonMouseListener(trustedUsersTable));
+
+
+    }
+
+    private void handleRemoveTrustedUser(User user) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("username", user.getUsername());
+        Request request = AuthorizedRequestBuilder.builder().setMethod(Method.REMOVE_TRUSTED_USER).setToken(client.getToken()).setBody(new Gson().toJson(jsonObject)).build();
+        GenericResponse response = client.sendAndReceive(request);
+        if (response.getStatus() == Status.SUCCESS) {
+            JOptionPane.showMessageDialog(this, "User removed from trusted users list", "Success", JOptionPane.INFORMATION_MESSAGE);
+            setupTrustedUsersTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to remove user from trusted users list", "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
     }
 
@@ -90,6 +117,36 @@ public class TrustedUsersListGUI extends JFrame {
     @Override
     public Insets getInsets() {
         return new Insets(50, 25, 25, 50);
+    }
+
+    private static class JTableButtonRenderer implements TableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JButton button = (JButton) value;
+            return button;
+        }
+    }
+
+    private static class JTableButtonMouseListener extends MouseAdapter {
+        private final JTable table;
+
+        public JTableButtonMouseListener(JTable table) {
+            this.table = table;
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            int column = table.getColumnModel().getColumnIndexAtX(e.getX());
+            int row = e.getY() / table.getRowHeight();
+
+            /*Checking the row or column is valid or not*/
+            if (row < table.getRowCount() && row >= 0 && column < table.getColumnCount() && column >= 0) {
+                Object value = table.getValueAt(row, column);
+                if (value instanceof JButton) {
+                    /*perform a click event*/
+                    ((JButton) value).doClick();
+                }
+            }
+        }
     }
 
 }

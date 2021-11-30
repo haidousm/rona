@@ -51,6 +51,7 @@ public class RequestFactory {
             case FIND_USER_BY_USERNAME:
             case ADD_TRUSTED_USER:
             case GET_TRUSTED_BY_USERS:
+            case REMOVE_TRUSTED_USER:
                 return AuthorizedRequestBuilder.builder().setMethod(requestMethod).build(requestBody);
             default:
                 throw new IllegalArgumentException("Invalid request type: " + requestMethod);

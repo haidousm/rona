@@ -9,6 +9,7 @@ import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -60,7 +61,7 @@ public class AuthGUI extends JFrame {
 
         uploadImageButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(new java.io.File("."));
+            fileChooser.setCurrentDirectory(new File("."));
             fileChooser.setDialogTitle("Select an image");
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setAcceptAllFileFilterUsed(false);
@@ -71,7 +72,7 @@ public class AuthGUI extends JFrame {
 
         uploadPDFButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(new java.io.File("."));
+            fileChooser.setCurrentDirectory(new File("."));
             fileChooser.setDialogTitle("Select a PDF");
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setAcceptAllFileFilterUsed(false);
