@@ -25,7 +25,7 @@ public class TrustedUsersListGUI extends JFrame {
     private JButton addUserButton;
     private JTextField searchTextField;
 
-    private Client client;
+    private final Client client;
 
     public TrustedUsersListGUI(String title, Client client) {
         super(title);
@@ -50,9 +50,9 @@ public class TrustedUsersListGUI extends JFrame {
     private void setupTrustedUsersTable() {
         String[] columnNames = {"Username", "First Name", "Last Name", "Email", ""};
         List<Object[]> data = new ArrayList<>();
+
         Request request = AuthorizedRequestBuilder.builder().setMethod(Method.GET_TRUSTED_USERS).setToken(client.getToken()).build();
-        client.send(request);
-        List<User> trustedUsers = UserResponseBuilder.builder().buildList(client.receive());
+        List<User> trustedUsers = UserResponseBuilder.builder().buildList(client.sendAndReceive(request));
         for (User user : trustedUsers) {
             data.add(new Object[]{user.getUsername(), user.getFirstName(), user.getLastName(), user.getEmail(), new JButton("Remove")});
         }
@@ -75,8 +75,7 @@ public class TrustedUsersListGUI extends JFrame {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("username", username);
         Request request = AuthorizedRequestBuilder.builder().setMethod(Method.ADD_TRUSTED_USER).setToken(client.getToken()).setBody(new Gson().toJson(jsonObject)).build();
-        client.send(request);
-        GenericResponse response = client.receive();
+        GenericResponse response = client.sendAndReceive(request);
         if (response.getStatus() == Status.USER_NOT_FOUND) {
             JOptionPane.showMessageDialog(this, "User not found", "Error", JOptionPane.ERROR_MESSAGE);
         } else if (response.getStatus() == Status.SUCCESS) {

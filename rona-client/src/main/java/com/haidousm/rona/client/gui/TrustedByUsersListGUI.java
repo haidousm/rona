@@ -7,7 +7,6 @@ import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.builders.HealthStatusResponseBuilder;
-import com.haidousm.rona.common.responses.builders.UserResponseBuilder;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,8 +18,8 @@ public class TrustedByUsersListGUI extends JFrame {
     private JPanel mainPanel;
     private JTable trustedByUsersTable;
     private JButton backButton;
-
-    private Client client;
+`
+    private final Client client;
 
     public TrustedByUsersListGUI(String title, Client client) {
         super(title);
@@ -44,8 +43,7 @@ public class TrustedByUsersListGUI extends JFrame {
         String[] columnNames = {"Username", "First Name", "Last Name", "Health Status"};
         List<Object[]> data = new ArrayList<>();
         Request request = AuthorizedRequestBuilder.builder().setMethod(Method.GET_TRUSTED_BY_USERS).setToken(client.getToken()).build();
-        client.send(request);
-        List<HealthStatus> healthStatuses = HealthStatusResponseBuilder.builder().buildList(client.receive());
+        List<HealthStatus> healthStatuses = HealthStatusResponseBuilder.builder().buildList(client.sendAndReceive(request));
 
         for (HealthStatus healthStatus : healthStatuses) {
             User user = healthStatus.getUser();

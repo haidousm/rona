@@ -86,8 +86,7 @@ public class AuthGUI extends JFrame {
         String username = usernameTextField.getText();
         String password = new String(passwordTextField.getPassword());
         Request request = UserController.prepareLogin(username, password);
-        client.send(request);
-        AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
+        AuthResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
         if (response.getStatus() == Status.SUCCESS) {
             client.setToken(response.getToken());
             goToHome(client);
@@ -104,8 +103,7 @@ public class AuthGUI extends JFrame {
         String lastName = lastNameTextField.getText();
         boolean isVaccinated = isVaccinatedCheckbox.isSelected();
         Request request = UserController.prepareRegisterUser(firstName, lastName, email, username, password, isVaccinated, pdfFilePath, imageFilePath);
-        client.send(request);
-        AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
+        AuthResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
         if (response.getStatus() == Status.SUCCESS) {
             client.setToken(response.getToken());
             goToHome(client);

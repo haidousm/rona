@@ -28,18 +28,23 @@ public class Client {
 
     }
 
-    public void send(Request request) {
+    private void send(Request request) {
         out.println(RequestFactory.createRequestString(request));
         out.flush();
     }
 
-    public GenericResponse receive() {
+    private GenericResponse receive() {
         try {
             return new Gson().fromJson(in.readLine(), GenericResponse.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public GenericResponse sendAndReceive(Request request) {
+        send(request);
+        return receive();
     }
 
     public void close() {

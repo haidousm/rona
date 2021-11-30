@@ -60,16 +60,14 @@ public class HomeGUI extends JFrame {
     }
 
     private void setupWelcomeMessage() {
-        Request getCurrentUserRequest = UserController.prepareGetCurrentUser(client.getToken());
-        client.send(getCurrentUserRequest);
-        User currentUser = UserResponseBuilder.builder().build(client.receive());
+        Request request = UserController.prepareGetCurrentUser(client.getToken());
+        User currentUser = UserResponseBuilder.builder().build(client.sendAndReceive(request));
         welcomeNameLabel.setText("Welcome " + currentUser.getFirstName() + " " + currentUser.getLastName());
     }
 
     private void setupHealthStatus() {
-        Request getHealthStatusRequest = AuthorizedRequestsController.prepareGetHealthStatusRequest(client.getToken());
-        client.send(getHealthStatusRequest);
-        HealthStatus healthStatus = HealthStatusResponseBuilder.builder().build(client.receive());
+        Request request = AuthorizedRequestsController.prepareGetHealthStatusRequest(client.getToken());
+        HealthStatus healthStatus = HealthStatusResponseBuilder.builder().build(client.sendAndReceive(request));
         this.healthStatus = healthStatus;
         if (healthStatus.getStatus() == Health.CONTAGIOUS) {
             declareHealthStatusButton.setBackground(Color.GREEN);
@@ -86,9 +84,8 @@ public class HomeGUI extends JFrame {
         String[] columnNames = {"", "Safe", "At Risk", "Contagious", "Total"};
         Object[][] data = new Object[rowNames.length + 1][columnNames.length];
 
-        Request getStats = AuthorizedRequestsController.prepareGetStatsRequest(client.getToken());
-        client.send(getStats);
-        StatsResponse statsResponse = StatsResponseBuilder.builder().build(client.receive());
+        Request request = AuthorizedRequestsController.prepareGetStatsRequest(client.getToken());
+        StatsResponse statsResponse = StatsResponseBuilder.builder().build(client.sendAndReceive(request));
 
         data[0][0] = rowNames[0];
         data[1][0] = rowNames[1];
@@ -118,17 +115,16 @@ public class HomeGUI extends JFrame {
     }
 
     private void handleDeclareHealthStatusClicked() {
-        Request declareHealthStatusRequest;
+        Request request;
         if (healthStatus.getStatus() == Health.CONTAGIOUS) {
-            declareHealthStatusRequest = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.SAFE);
+            request = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.SAFE);
             healthStatus.setStatus(Health.SAFE);
         } else {
-            declareHealthStatusRequest = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.CONTAGIOUS);
+            request = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.CONTAGIOUS);
             healthStatus.setStatus(Health.CONTAGIOUS);
 
         }
-        client.send(declareHealthStatusRequest);
-        client.receive();
+        client.sendAndReceive(request);
         statusLabel.setText("Status: " + healthStatus.getStatus().name());
         if (healthStatus.getStatus() == Health.CONTAGIOUS) {
             declareHealthStatusButton.setBackground(Color.GREEN);
