@@ -8,20 +8,21 @@ import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
+import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.Request;
+import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class TrustedUsersHandler {
-    public static GenericResponse handleGetTrustedUsers(Request request) {
+    public static GenericResponse handleGetTrustedUsers(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = getTrustedUsers((AuthorizedRequest) request);
+            genericResponse = getTrustedUsers(AuthorizedRequestBuilder.builder().build(request.getBody()));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -54,10 +55,10 @@ public class TrustedUsersHandler {
         return genericResponse;
     }
 
-    public static GenericResponse handleAddTrustedUser(Request request) {
+    public static GenericResponse handleAddTrustedUser(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = addTrustedUser((AuthorizedRequest) request);
+            genericResponse = addTrustedUser(AuthorizedRequestBuilder.builder().build(request.getBody()));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -98,10 +99,10 @@ public class TrustedUsersHandler {
         return genericResponse;
     }
 
-    public static GenericResponse handleGetTrustedByUsers(Request request) {
+    public static GenericResponse handleGetTrustedByUsers(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = getTrustedByUsers((AuthorizedRequest) request);
+            genericResponse = getTrustedByUsers(AuthorizedRequestBuilder.builder().build(request.getBody()));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -131,10 +132,10 @@ public class TrustedUsersHandler {
         return genericResponse;
     }
 
-    public static GenericResponse handleRemoveTrustedUser(Request request) {
+    public static GenericResponse handleRemoveTrustedUser(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = removeTrustedUser((AuthorizedRequest) request);
+            genericResponse = removeTrustedUser(AuthorizedRequestBuilder.builder().build(request.getBody()));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }

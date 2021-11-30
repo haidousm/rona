@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.haidousm.rona.common.entity.ConnectionDetails;
 import com.haidousm.rona.common.entity.HealthStatus;
 import com.haidousm.rona.common.enums.Health;
+import com.haidousm.rona.common.requests.GenericRequest;
+import com.haidousm.rona.common.requests.builders.RegisterRequestBuilder;
 import com.haidousm.rona.common.responses.AuthResponse;
 import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 import com.haidousm.rona.common.entity.User;
@@ -20,10 +22,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class RegisterHandler {
-    public static GenericResponse handleRegister(Request request) {
+    public static GenericResponse handleRegister(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            AuthResponse authResponse = register((RegisterRequest) request);
+            AuthResponse authResponse = register(RegisterRequestBuilder.builder().build(request.getBody()));
             genericResponse.setStatus(authResponse.getStatus());
             genericResponse.setResponse(new Gson().toJson(authResponse));
         } catch (Exception e) {

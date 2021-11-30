@@ -5,7 +5,9 @@ import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
+import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.Request;
+import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.responses.StatsResponse;
 import com.haidousm.rona.common.responses.builders.StatsResponseBuilder;
@@ -13,10 +15,10 @@ import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Transaction;
 
 public class StatsHandler {
-    public static GenericResponse handleGetStats(Request request) {
+    public static GenericResponse handleGetStats(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            StatsResponse statsResponse = getStats((AuthorizedRequest) request);
+            StatsResponse statsResponse = getStats(AuthorizedRequestBuilder.builder().build(request.getBody()));
             genericResponse.setStatus(statsResponse.getStatus());
             genericResponse.setResponse(new Gson().toJson(statsResponse));
         } catch (Exception e) {

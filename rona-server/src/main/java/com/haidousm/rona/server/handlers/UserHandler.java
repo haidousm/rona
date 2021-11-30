@@ -6,7 +6,9 @@ import com.google.gson.JsonObject;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.enums.Status;
+import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.Request;
+import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.server.utils.HibernateUtil;
@@ -16,10 +18,10 @@ import java.util.List;
 
 public class UserHandler {
 
-    public static GenericResponse handleGetUserDetails(Request request) {
+    public static GenericResponse handleGetUserDetails(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = getUserDetailsByUsername((AuthorizedRequest) request);
+            genericResponse = getUserDetailsByUsername(AuthorizedRequestBuilder.builder().build(request.getBody()));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -68,10 +70,10 @@ public class UserHandler {
         return genericResponse;
     }
 
-    public static GenericResponse handleGetCurrentUserDetails(Request request) {
+    public static GenericResponse handleGetCurrentUserDetails(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = getCurrentUserDetails((AuthorizedRequest) request);
+            genericResponse = getCurrentUserDetails(AuthorizedRequestBuilder.builder().build(request.getBody()));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }

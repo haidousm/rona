@@ -1,8 +1,8 @@
 package com.haidousm.rona.client.client;
 
 import com.google.gson.Gson;
+import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.RequestFactory;
 import com.haidousm.rona.common.responses.GenericResponse;
 
 import java.io.BufferedReader;
@@ -29,7 +29,10 @@ public class Client {
     }
 
     private void send(Request request) {
-        out.println(RequestFactory.createRequestString(request));
+        GenericRequest genericRequest = new GenericRequest();
+        genericRequest.setMethod(request.getMethod());
+        genericRequest.setBody(new Gson().toJson(request));
+        out.println(new Gson().toJson(genericRequest));
         out.flush();
     }
 

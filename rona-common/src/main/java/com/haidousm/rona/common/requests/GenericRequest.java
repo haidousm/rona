@@ -1,32 +1,47 @@
 package com.haidousm.rona.common.requests;
 
 import com.haidousm.rona.common.enums.Method;
+import com.sun.istack.Nullable;
 
 public class GenericRequest implements Request {
 
+    @Nullable
     private String ipAddress;
+    @Nullable
     private int port;
+    Method method;
+    private String body;
 
     public void setIPAddress(String ipAddress) {
         this.ipAddress = ipAddress;
+    }
+
+    public String getIPAddress() {
+        return ipAddress;
+    }
+
+
+    public int getPort() {
+        return port;
     }
 
     public void setPort(int port) {
         this.port = port;
     }
 
-    @Override
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
     public Method getMethod() {
-        return Method.UNDEFINED;
+        return method;
     }
 
-    @Override
-    public String getIPAddress() {
-        return ipAddress;
+    public String getBody() {
+        return body;
     }
 
-    @Override
-    public int getPort() {
-        return port;
+    public void setBody(String body) {
+        this.body = body;
     }
 }
