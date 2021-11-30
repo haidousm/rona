@@ -26,6 +26,7 @@ public class GenericResponseBuilder {
         return new Gson().fromJson(json, GenericResponse.class);
     }
 
+
     public static GenericResponseBuilder builder() {
         return new GenericResponseBuilder();
     }

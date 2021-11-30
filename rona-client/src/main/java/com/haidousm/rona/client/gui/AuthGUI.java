@@ -9,6 +9,7 @@ import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -60,7 +61,7 @@ public class AuthGUI extends JFrame {
 
         uploadImageButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(new java.io.File("."));
+            fileChooser.setCurrentDirectory(new File("."));
             fileChooser.setDialogTitle("Select an image");
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setAcceptAllFileFilterUsed(false);
@@ -71,7 +72,7 @@ public class AuthGUI extends JFrame {
 
         uploadPDFButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(new java.io.File("."));
+            fileChooser.setCurrentDirectory(new File("."));
             fileChooser.setDialogTitle("Select a PDF");
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setAcceptAllFileFilterUsed(false);
@@ -86,10 +87,10 @@ public class AuthGUI extends JFrame {
         String username = usernameTextField.getText();
         String password = new String(passwordTextField.getPassword());
         Request request = UserController.prepareLogin(username, password);
-        client.send(request);
-        AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
+        AuthResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
         if (response.getStatus() == Status.SUCCESS) {
-            goToHome(client, response);
+            client.setToken(response.getToken());
+            goToHome(client);
         } else {
             JOptionPane.showMessageDialog(this, "Login failed");
         }
@@ -103,18 +104,18 @@ public class AuthGUI extends JFrame {
         String lastName = lastNameTextField.getText();
         boolean isVaccinated = isVaccinatedCheckbox.isSelected();
         Request request = UserController.prepareRegisterUser(firstName, lastName, email, username, password, isVaccinated, pdfFilePath, imageFilePath);
-        client.send(request);
-        AuthResponse response = AuthResponseBuilder.builder().build(client.receive());
+        AuthResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
         if (response.getStatus() == Status.SUCCESS) {
-            goToHome(client, response);
+            client.setToken(response.getToken());
+            goToHome(client);
         } else {
             JOptionPane.showMessageDialog(this, "Register failed");
         }
     }
 
-    private void goToHome(Client client, AuthResponse response) {
+    private void goToHome(Client client) {
         dispose();
-        HomeGUI homeGUI = new HomeGUI("Home", client, response);
+        HomeGUI homeGUI = new HomeGUI("Home", client);
         homeGUI.setVisible(true);
     }
 

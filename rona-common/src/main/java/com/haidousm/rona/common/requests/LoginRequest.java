@@ -5,8 +5,8 @@ import com.google.gson.Gson;
 import com.haidousm.rona.common.enums.Method;
 
 public class LoginRequest extends GenericRequest {
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
 
     public LoginRequest(String username, String password) {
         this.username = username;

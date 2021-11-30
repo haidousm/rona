@@ -1,7 +1,10 @@
 package com.haidousm.rona.common.entity;
 
+import com.google.gson.annotations.Expose;
+
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity
@@ -10,31 +13,44 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Expose
     private int id;
 
     @Column(name = "first_name")
+    @Expose
     private String firstName;
 
     @Column(name = "last_name")
+    @Expose
     private String lastName;
 
     @Column(name = "email", unique = true)
+    @Expose
     private String email;
 
     @Column(name = "username", unique = true)
+    @Expose
     private String username;
 
     @Column(name = "password")
     private String password;
 
     @Column(name = "is_vaccinated")
+    @Expose
     private boolean isVaccinated;
 
     @Column(name = "vaccination_certificate_file_path")
+    @Expose
     private String vaccinationCertificateFilePath;
 
     @Column(name = "image_file_path")
+    @Expose
     private String imageFilePath;
+
+    @Column(name = "health_statuses")
+    @OneToMany(mappedBy = "user")
+    @Expose
+    private List<HealthStatus> healthStatuses;
 
     @ManyToMany
     @JoinTable(name = "trusted_users",
@@ -64,6 +80,7 @@ public class User {
         this.imageFilePath = imageFilePath;
         this.trustedUsers = new ArrayList<>();
         this.trustedByUsers = new ArrayList<>();
+        this.healthStatuses = new ArrayList<>();
     }
 
     public int getId() {
@@ -110,25 +127,10 @@ public class User {
         return trustedByUsers;
     }
 
-    public void trustUser(User user) {
-        trustedUsers.add(user);
-        user.getTrustedByUsers().add(this);
+    public List<HealthStatus> getHealthStatuses() {
+        healthStatuses.sort(Comparator.comparing(HealthStatus::getTimestamp).reversed());
+        return healthStatuses;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", isVaccinated=" + isVaccinated +
-                ", vaccinationCertificateFilePath='" + vaccinationCertificateFilePath + '\'' +
-                ", imageFilePath='" + imageFilePath + '\'' +
-                ", trustedByUsers=" + trustedByUsers +
-                '}';
-    }
 
 }

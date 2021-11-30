@@ -2,6 +2,8 @@ package com.haidousm.rona.server.handlers;
 
 import com.google.gson.GsonBuilder;
 import com.haidousm.rona.common.entity.ConnectionDetails;
+import com.haidousm.rona.common.requests.GenericRequest;
+import com.haidousm.rona.common.requests.builders.LoginRequestBuilder;
 import com.haidousm.rona.common.responses.AuthResponse;
 import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 import com.haidousm.rona.common.entity.User;
@@ -15,10 +17,10 @@ import org.hibernate.Transaction;
 
 public class LoginHandler {
 
-    public static GenericResponse handleLogin(Request request) {
+    public static GenericResponse handleLogin(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            AuthResponse authResponse = login((LoginRequest) request);
+            AuthResponse authResponse = login(LoginRequestBuilder.builder().build(request.getBody()));
             genericResponse.setStatus(authResponse.getStatus());
             genericResponse.setResponse(new GsonBuilder().create().toJson(authResponse));
         } catch (Exception e) {

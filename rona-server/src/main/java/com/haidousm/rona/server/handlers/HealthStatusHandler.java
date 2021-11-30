@@ -1,6 +1,7 @@
 package com.haidousm.rona.server.handlers;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.haidousm.rona.common.entity.HealthStatus;
 import com.haidousm.rona.common.entity.User;
@@ -8,16 +9,18 @@ import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
+import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.Request;
+import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Transaction;
 
 public class HealthStatusHandler {
-    public static GenericResponse handleGetCurrentUserHealthStatus(Request request) {
+    public static GenericResponse handleGetCurrentUserHealthStatus(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = getCurrentUserHealthStatus((AuthorizedRequest) request);
+            genericResponse = getCurrentUserHealthStatus(AuthorizedRequestBuilder.builder().build(request.getBody()));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -33,8 +36,8 @@ public class HealthStatusHandler {
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
-                HealthStatus healthStatus = HibernateUtil.getSession().createQuery("from HealthStatus where user = :user", HealthStatus.class).setParameter("user", currentUser).getSingleResult();
-                genericResponse.setResponse(new Gson().toJson(healthStatus));
+                HealthStatus healthStatus = currentUser.getHealthStatuses().get(0);
+                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(healthStatus));
                 tx.commit();
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
@@ -45,10 +48,10 @@ public class HealthStatusHandler {
         return genericResponse;
     }
 
-    public static GenericResponse handleUpdateCurrentUserHealthStatus(Request request) {
+    public static GenericResponse handleUpdateCurrentUserHealthStatus(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = updateCurrentUserHealthStatus((AuthorizedRequest) request);
+            genericResponse = updateCurrentUserHealthStatus(AuthorizedRequestBuilder.builder().build(request.getBody()));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -64,10 +67,10 @@ public class HealthStatusHandler {
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
-                HealthStatus healthStatus = HibernateUtil.getSession().createQuery("from HealthStatus where user = :user", HealthStatus.class).setParameter("user", currentUser).getSingleResult();
                 JsonObject jsonObject = new Gson().fromJson(authorizedRequest.getBody(), JsonObject.class);
-                healthStatus.setStatus(Health.valueOf(jsonObject.get("status").getAsString()));
-                HibernateUtil.getSession().update(healthStatus);
+                Health health = Health.valueOf(jsonObject.get("status").getAsString());
+                HealthStatus healthStatus = new HealthStatus(health, currentUser);
+                HibernateUtil.getSession().save(healthStatus);
                 tx.commit();
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);

@@ -1,14 +1,12 @@
 package com.haidousm.rona.client.gui;
 
 import com.haidousm.rona.client.client.Client;
-import com.haidousm.rona.client.controllers.HealthStatusController;
-import com.haidousm.rona.client.controllers.StatsController;
+import com.haidousm.rona.client.controllers.AuthorizedRequestsController;
 import com.haidousm.rona.client.controllers.UserController;
 import com.haidousm.rona.common.entity.HealthStatus;
 import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.responses.AuthResponse;
 import com.haidousm.rona.common.responses.StatsResponse;
 import com.haidousm.rona.common.responses.builders.HealthStatusResponseBuilder;
 import com.haidousm.rona.common.responses.builders.StatsResponseBuilder;
@@ -26,20 +24,18 @@ public class HomeGUI extends JFrame {
     private JTable statsTable;
     private JButton friendsAndFamilyButton;
     private JButton logOutButton;
-    private JButton addTrustedMemberButton;
+    private JButton addTrustedUserButton;
 
     private final Client client;
-    private final String authToken;
     private HealthStatus healthStatus;
 
-    public HomeGUI(String name, Client client, AuthResponse authResponse) {
+    public HomeGUI(String name, Client client) {
         super(name);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setContentPane(mainPane);
         pack();
         setLocationRelativeTo(null);
         this.client = client;
-        this.authToken = authResponse.getToken();
 
         setupWelcomeMessage();
         setupHealthStatus();
@@ -53,19 +49,25 @@ public class HomeGUI extends JFrame {
             handleLogoutClicked();
         });
 
+        friendsAndFamilyButton.addActionListener(e -> {
+            handleFriendsAndFamilyClicked();
+        });
+
+        addTrustedUserButton.addActionListener(e -> {
+            handleAddTrustedUserClicked();
+        });
+
     }
 
     private void setupWelcomeMessage() {
-        Request getCurrentUserRequest = UserController.prepareGetCurrentUser(authToken);
-        client.send(getCurrentUserRequest);
-        User currentUser = UserResponseBuilder.builder().build(client.receive());
+        Request request = UserController.prepareGetCurrentUser(client.getToken());
+        User currentUser = UserResponseBuilder.builder().build(client.sendAndReceive(request));
         welcomeNameLabel.setText("Welcome " + currentUser.getFirstName() + " " + currentUser.getLastName());
     }
 
     private void setupHealthStatus() {
-        Request getHealthStatusRequest = HealthStatusController.prepareGetHealthStatusRequest(authToken);
-        client.send(getHealthStatusRequest);
-        HealthStatus healthStatus = HealthStatusResponseBuilder.builder().build(client.receive());
+        Request request = AuthorizedRequestsController.prepareGetHealthStatusRequest(client.getToken());
+        HealthStatus healthStatus = HealthStatusResponseBuilder.builder().build(client.sendAndReceive(request));
         this.healthStatus = healthStatus;
         if (healthStatus.getStatus() == Health.CONTAGIOUS) {
             declareHealthStatusButton.setBackground(Color.GREEN);
@@ -82,9 +84,8 @@ public class HomeGUI extends JFrame {
         String[] columnNames = {"", "Safe", "At Risk", "Contagious", "Total"};
         Object[][] data = new Object[rowNames.length + 1][columnNames.length];
 
-        Request getStats = StatsController.prepareGetStatsRequest(authToken);
-        client.send(getStats);
-        StatsResponse statsResponse = StatsResponseBuilder.builder().build(client.receive());
+        Request request = AuthorizedRequestsController.prepareGetStatsRequest(client.getToken());
+        StatsResponse statsResponse = StatsResponseBuilder.builder().build(client.sendAndReceive(request));
 
         data[0][0] = rowNames[0];
         data[1][0] = rowNames[1];
@@ -114,17 +115,16 @@ public class HomeGUI extends JFrame {
     }
 
     private void handleDeclareHealthStatusClicked() {
-        Request declareHealthStatusRequest;
+        Request request;
         if (healthStatus.getStatus() == Health.CONTAGIOUS) {
-            declareHealthStatusRequest = HealthStatusController.prepareUpdateHealthStatusRequest(authToken, Health.SAFE);
+            request = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.SAFE);
             healthStatus.setStatus(Health.SAFE);
         } else {
-            declareHealthStatusRequest = HealthStatusController.prepareUpdateHealthStatusRequest(authToken, Health.CONTAGIOUS);
+            request = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.CONTAGIOUS);
             healthStatus.setStatus(Health.CONTAGIOUS);
 
         }
-        client.send(declareHealthStatusRequest);
-        client.receive();
+        client.sendAndReceive(request);
         statusLabel.setText("Status: " + healthStatus.getStatus().name());
         if (healthStatus.getStatus() == Health.CONTAGIOUS) {
             declareHealthStatusButton.setBackground(Color.GREEN);
@@ -139,11 +139,24 @@ public class HomeGUI extends JFrame {
 
     private void handleLogoutClicked() {
         this.dispose();
+        client.setToken("");
         new AuthGUI("Rona", client).setVisible(true);
+    }
+
+    private void handleAddTrustedUserClicked() {
+        dispose();
+        new TrustedUsersListGUI("Rona", client).setVisible(true);
+
+    }
+
+    private void handleFriendsAndFamilyClicked() {
+        dispose();
+        new TrustedByUsersListGUI("Rona", client).setVisible(true);
     }
 
     @Override
     public Insets getInsets() {
         return new Insets(50, 25, 25, 50);
     }
+
 }

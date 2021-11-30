@@ -1,8 +1,8 @@
 package com.haidousm.rona.client.client;
 
 import com.google.gson.Gson;
+import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.RequestFactory;
 import com.haidousm.rona.common.responses.GenericResponse;
 
 import java.io.BufferedReader;
@@ -17,6 +17,8 @@ public class Client {
     private String ip;
     private int port;
 
+    private String token = "";
+
     public Client(String ip, int port) throws IOException {
         this.ip = ip;
         this.port = port;
@@ -26,12 +28,15 @@ public class Client {
 
     }
 
-    public void send(Request request) {
-        out.println(RequestFactory.createRequestString(request));
+    private void send(Request request) {
+        GenericRequest genericRequest = new GenericRequest();
+        genericRequest.setMethod(request.getMethod());
+        genericRequest.setBody(new Gson().toJson(request));
+        out.println(new Gson().toJson(genericRequest));
         out.flush();
     }
 
-    public GenericResponse receive() {
+    private GenericResponse receive() {
         try {
             return new Gson().fromJson(in.readLine(), GenericResponse.class);
         } catch (IOException e) {
@@ -40,11 +45,24 @@ public class Client {
         return null;
     }
 
+    public GenericResponse sendAndReceive(Request request) {
+        send(request);
+        return receive();
+    }
+
     public void close() {
         try {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

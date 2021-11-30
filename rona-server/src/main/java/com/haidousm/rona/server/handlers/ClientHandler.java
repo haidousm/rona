@@ -1,7 +1,7 @@
 package com.haidousm.rona.server.handlers;
 
-import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.RequestFactory;
+import com.google.gson.Gson;
+import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.enums.Status;
 
@@ -29,7 +29,7 @@ public class ClientHandler implements Runnable {
         try {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                Request request = RequestFactory.createRequest(line);
+                GenericRequest request = new Gson().fromJson(line, GenericRequest.class);
                 request.setIPAddress(socket.getInetAddress().getHostAddress());
                 request.setPort(socket.getPort());
                 GenericResponse genericResponse = handleRequest(request);
@@ -50,7 +50,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private GenericResponse handleRequest(Request request) {
+    private GenericResponse handleRequest(GenericRequest request) {
         GenericResponse genericResponse;
         switch (request.getMethod()) {
             case LOGIN:
@@ -62,7 +62,7 @@ public class ClientHandler implements Runnable {
             case GET_USER:
                 genericResponse = UserHandler.handleGetCurrentUserDetails(request);
                 break;
-            case GET_USER_BY:
+            case FIND_USER_BY_USERNAME:
                 genericResponse = UserHandler.handleGetUserDetails(request);
                 break;
             case GET_ALL_USERS:
@@ -76,6 +76,18 @@ public class ClientHandler implements Runnable {
                 break;
             case GET_STATS:
                 genericResponse = StatsHandler.handleGetStats(request);
+                break;
+            case GET_TRUSTED_USERS:
+                genericResponse = TrustedUsersHandler.handleGetTrustedUsers(request);
+                break;
+            case GET_TRUSTED_BY_USERS:
+                genericResponse = TrustedUsersHandler.handleGetTrustedByUsers(request);
+                break;
+            case ADD_TRUSTED_USER:
+                genericResponse = TrustedUsersHandler.handleAddTrustedUser(request);
+                break;
+            case REMOVE_TRUSTED_USER:
+                genericResponse = TrustedUsersHandler.handleRemoveTrustedUser(request);
                 break;
             default:
                 genericResponse = new GenericResponse();
