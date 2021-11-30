@@ -66,7 +66,7 @@ public class RegisterHandler {
 
             tx = HibernateUtil.beginTransaction();
 
-            HealthStatus healthStatus = new HealthStatus(Health.SAFE, System.currentTimeMillis(), newUser);
+            HealthStatus healthStatus = new HealthStatus(Health.SAFE, newUser);
             ConnectionDetails connectionDetails = new ConnectionDetails(registerRequest.getIPAddress(), registerRequest.getPort(), newUser);
             UserAuthToken userAuthToken = new UserAuthToken(token, expiryTimestamp, newUser);
             HibernateUtil.getSession().save(userAuthToken);

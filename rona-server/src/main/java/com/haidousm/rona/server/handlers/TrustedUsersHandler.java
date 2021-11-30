@@ -112,7 +112,6 @@ public class TrustedUsersHandler {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
 
-        // TODO: NEEDS A SHITTON OF REFACTORING, PROBS INCLUDE HEALTH STATUS IN USER TABLE INSTEAD OF THIS
         String token = request.getToken();
         Transaction tx = HibernateUtil.beginTransaction();
         UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
@@ -120,14 +119,7 @@ public class TrustedUsersHandler {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
                 List<User> trustedByUsers = currentUser.getTrustedByUsers();
-                List<HealthStatus> healthStatuses = new ArrayList<>();
-                if (trustedByUsers != null) {
-                    for (User user : trustedByUsers) {
-                        HealthStatus healthStatus = HibernateUtil.getSession().createQuery("from HealthStatus where user = :user", HealthStatus.class).setParameter("user", user).getSingleResult();
-                        healthStatuses.add(healthStatus);
-                    }
-                }
-                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(healthStatuses));
+                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(trustedByUsers));
                 tx.commit();
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);

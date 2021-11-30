@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity
@@ -46,6 +47,11 @@ public class User {
     @Expose
     private String imageFilePath;
 
+    @Column(name = "health_statuses")
+    @OneToMany(mappedBy = "user")
+    @Expose
+    private List<HealthStatus> healthStatuses;
+
     @ManyToMany
     @JoinTable(name = "trusted_users",
             joinColumns = @JoinColumn(name = "trusterId"),
@@ -74,6 +80,7 @@ public class User {
         this.imageFilePath = imageFilePath;
         this.trustedUsers = new ArrayList<>();
         this.trustedByUsers = new ArrayList<>();
+        this.healthStatuses = new ArrayList<>();
     }
 
     public int getId() {
@@ -120,24 +127,9 @@ public class User {
         return trustedByUsers;
     }
 
-    public void trustUser(User user) {
-        trustedUsers.add(user);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", isVaccinated=" + isVaccinated +
-                ", vaccinationCertificateFilePath='" + vaccinationCertificateFilePath + '\'' +
-                ", imageFilePath='" + imageFilePath + '\'' +
-                ", trustedByUsers=" + trustedByUsers +
-                '}';
+    public List<HealthStatus> getHealthStatuses() {
+        healthStatuses.sort(Comparator.comparing(HealthStatus::getTimestamp).reversed());
+        return healthStatuses;
     }
 
 

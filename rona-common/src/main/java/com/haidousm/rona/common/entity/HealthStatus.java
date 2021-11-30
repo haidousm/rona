@@ -22,17 +22,16 @@ public class HealthStatus {
     @Expose
     private long timestamp;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
-    @Expose
     private User user;
 
     public HealthStatus() {
     }
 
-    public HealthStatus(Health status, long timestamp, User user) {
+    public HealthStatus(Health status, User user) {
         this.status = status;
-        this.timestamp = timestamp;
+        this.timestamp = System.currentTimeMillis();
         this.user = user;
     }
 
@@ -57,13 +56,4 @@ public class HealthStatus {
         return user;
     }
 
-    @Override
-    public String toString() {
-        return "HealthStatus{" +
-                "id=" + id +
-                ", status=" + status +
-                ", timestamp=" + timestamp +
-                ", user_id=" + user.getId() +
-                '}';
-    }
 }
