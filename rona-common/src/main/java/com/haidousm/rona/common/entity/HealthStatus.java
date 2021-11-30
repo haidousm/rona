@@ -24,6 +24,7 @@ public class HealthStatus {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @Expose
     private User user;
 
     public HealthStatus() {

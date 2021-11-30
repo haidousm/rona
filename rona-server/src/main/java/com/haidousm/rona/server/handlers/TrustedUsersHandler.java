@@ -11,9 +11,9 @@ import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.utils.HibernateUtil;
-import org.hibernate.Hibernate;
 import org.hibernate.Transaction;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,6 +88,47 @@ public class TrustedUsersHandler {
                 } else {
                     genericResponse.setStatus(Status.USER_NOT_FOUND);
                 }
+            } else {
+                genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            genericResponse.setStatus(Status.UNAUTHORIZED);
+        }
+
+        return genericResponse;
+    }
+
+    public static GenericResponse handleGetTrustedByUsers(Request request) {
+        GenericResponse genericResponse = new GenericResponse();
+        try {
+            genericResponse = getTrustedByUsers((AuthorizedRequest) request);
+        } catch (Exception e) {
+            genericResponse.setStatus(Status.BAD_REQUEST);
+        }
+        return genericResponse;
+    }
+
+    private static GenericResponse getTrustedByUsers(AuthorizedRequest request) {
+        GenericResponse genericResponse = new GenericResponse();
+        genericResponse.setStatus(Status.SUCCESS);
+
+        // TODO: NEEDS A SHITTON OF REFACTORING, PROBS INCLUDE HEALTH STATUS IN USER TABLE INSTEAD OF THIS
+        String token = request.getToken();
+        Transaction tx = HibernateUtil.beginTransaction();
+        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        if (userAuthToken != null) {
+            User currentUser = userAuthToken.getUser();
+            if (currentUser != null) {
+                List<User> trustedByUsers = currentUser.getTrustedByUsers();
+                List<HealthStatus> healthStatuses = new ArrayList<>();
+                if (trustedByUsers != null) {
+                    for (User user : trustedByUsers) {
+                        HealthStatus healthStatus = HibernateUtil.getSession().createQuery("from HealthStatus where user = :user", HealthStatus.class).setParameter("user", user).getSingleResult();
+                        healthStatuses.add(healthStatus);
+                    }
+                }
+                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(healthStatuses));
+                tx.commit();
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
             }

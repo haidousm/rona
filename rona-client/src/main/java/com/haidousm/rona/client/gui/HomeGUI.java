@@ -49,6 +49,10 @@ public class HomeGUI extends JFrame {
             handleLogoutClicked();
         });
 
+        friendsAndFamilyButton.addActionListener(e -> {
+            handleFriendsAndFamilyClicked();
+        });
+
         addTrustedUserButton.addActionListener(e -> {
             handleAddTrustedUserClicked();
         });
@@ -147,6 +151,11 @@ public class HomeGUI extends JFrame {
         dispose();
         new TrustedUsersListGUI("Rona", client).setVisible(true);
 
+    }
+
+    private void handleFriendsAndFamilyClicked() {
+        dispose();
+        new TrustedByUsersListGUI("Rona", client).setVisible(true);
     }
 
     @Override

@@ -80,6 +80,9 @@ public class ClientHandler implements Runnable {
             case GET_TRUSTED_USERS:
                 genericResponse = TrustedUsersHandler.handleGetTrustedUsers(request);
                 break;
+            case GET_TRUSTED_BY_USERS:
+                genericResponse = TrustedUsersHandler.handleGetTrustedByUsers(request);
+                break;
             case ADD_TRUSTED_USER:
                 genericResponse = TrustedUsersHandler.handleAddTrustedUser(request);
                 break;
