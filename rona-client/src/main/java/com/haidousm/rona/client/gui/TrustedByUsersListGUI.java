@@ -18,7 +18,7 @@ public class TrustedByUsersListGUI extends JFrame {
     private JPanel mainPanel;
     private JTable trustedByUsersTable;
     private JButton backButton;
-`
+
     private final Client client;
 
     public TrustedByUsersListGUI(String title, Client client) {
