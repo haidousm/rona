@@ -7,6 +7,10 @@ public enum Method {
     /* Users Stuff */
     GET_USER("GET_CURRENT_USER"),
     FIND_USER_BY_USERNAME("FIND_USER_BY_USERNAME"),
+    /* Users Location*/
+    GET_ALL_LOCATIONS("GET_ALL_LOCATIONS"),
+    UPDATE_LOCATION_USERS("UPDATE_LOCATION_USERS"),
+
     GET_ALL_USERS("GET_ALL_USERS"),
     /* Trusted Users Stuff */
     ADD_TRUSTED_USER("ADD_TRUSTED_USER"),
