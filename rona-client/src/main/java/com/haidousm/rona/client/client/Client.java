@@ -1,6 +1,7 @@
 package com.haidousm.rona.client.client;
 
 import com.google.gson.Gson;
+import com.haidousm.rona.client.controllers.AuthorizedRequestsController;
 import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.responses.GenericResponse;
@@ -9,7 +10,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -23,7 +26,7 @@ public class Client {
 
     private ScheduledFuture<?> future;
 
-    HashSet<Integer[]> possibleCoords = new HashSet<>() {
+    List<Integer[]> possibleCoords = new ArrayList<>() {
         {
             add(new Integer[]{0, 0});
             add(new Integer[]{0, 1});
@@ -87,7 +90,11 @@ public class Client {
     }
 
     public void beginTransmittingLocation(int interval) {
-        Runnable transmitLocation = () -> System.out.println("Sending location");
+        Runnable transmitLocation = () -> {
+            Integer[] coords = possibleCoords.get(new Random().nextInt(possibleCoords.size()));
+            Request request = AuthorizedRequestsController.prepareUpdateUserLocationRequest(token, coords);
+            this.sendAndReceive(request);
+        };
         ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
         this.future = exec.scheduleAtFixedRate(transmitLocation, 0, interval, java.util.concurrent.TimeUnit.SECONDS);
     }
@@ -95,4 +102,6 @@ public class Client {
     public void stopTransmittingLocation() {
         this.future.cancel(true);
     }
+
+
 }

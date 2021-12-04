@@ -25,4 +25,12 @@ public class AuthorizedRequestsController {
     public static Request prepareGetTrustedUsersRequest(String token) {
         return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.GET_TRUSTED_USERS).build();
     }
+
+    public static Request prepareUpdateUserLocationRequest(String token, Integer[] coords) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("latitude", coords[0]);
+        jsonObject.addProperty("longitude", coords[1]);
+        return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.UPDATE_USER_LOCATION).setBody(new Gson().toJson(jsonObject)).build();
+    }
+
 }
