@@ -38,6 +38,8 @@ public class TrustedUsersListGUI extends JFrame {
         setLocationRelativeTo(null);
 
         this.client = client;
+        client.setCurrentFrame(this);
+
         backButton.addActionListener(e -> {
             this.dispose();
             new HomeGUI("Home", client).setVisible(true);

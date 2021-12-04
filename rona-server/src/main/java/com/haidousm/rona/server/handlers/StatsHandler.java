@@ -45,6 +45,7 @@ public class StatsHandler {
             int numberOfContagiousAndVaccinatedUsers = 0;
             int numberOfContagiousAndUnVaccinatedUsers = 0;
             List<User> users = HibernateUtil.getSession().createQuery("from User", User.class).getResultList();
+            tx.commit();
 
             for (User user : users) {
                 if (user.getHealthStatuses().get(0).getStatus() == Health.SAFE && user.getIsVaccinated()) {
@@ -63,7 +64,6 @@ public class StatsHandler {
             }
 
             statsResponse = StatsResponseBuilder.builder().setNumberOfSafeAndVaccinatedUsers(numberOfSafeAndVaccinatedUsers).setNumberOfSafeAndUnVaccinatedUsers(numberOfSafeAndUnVaccinatedUsers).setNumberOfAtRiskAndVaccinatedUsers(numberOfAtRiskAndVaccinatedUsers).setNumberOfAtRiskAndUnVaccinatedUsers(numberOfAtRiskAndUnVaccinatedUsers).setNumberOfContagiousAndVaccinatedUsers(numberOfContagiousAndVaccinatedUsers).setNumberOfContagiousAndUnVaccinatedUsers(numberOfContagiousAndUnVaccinatedUsers).build();
-            tx.commit();
             statsResponse.setStatus(Status.SUCCESS);
         } catch (Exception e) {
             e.printStackTrace();

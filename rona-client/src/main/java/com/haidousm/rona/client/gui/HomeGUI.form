@@ -16,22 +16,6 @@
           <text value="Friends and Family"/>
         </properties>
       </component>
-      <component id="cdef3" class="javax.swing.JButton" binding="declareHealthStatusButton">
-        <constraints>
-          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-          <gridbag weightx="1.0" weighty="0.0"/>
-        </constraints>
-        <properties>
-          <background color="-64000"/>
-          <borderPainted value="false"/>
-          <contentAreaFilled value="true"/>
-          <focusPainted value="false"/>
-          <foreground color="-1"/>
-          <hideActionText value="false"/>
-          <opaque value="true"/>
-          <text value="I'm POSITIVE!"/>
-        </properties>
-      </component>
       <scrollpane id="6a071">
         <constraints>
           <grid row="3" column="1" row-span="2" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -80,6 +64,38 @@
         </constraints>
         <properties>
           <text value="Label"/>
+        </properties>
+      </component>
+      <component id="6e23c" class="javax.swing.JButton" binding="declareSafeHealthStatus">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <background color="-16711936"/>
+          <borderPainted value="false"/>
+          <contentAreaFilled value="true"/>
+          <focusPainted value="false"/>
+          <foreground color="-1"/>
+          <hideActionText value="false"/>
+          <opaque value="true"/>
+          <text value="Declare SAFE status!"/>
+        </properties>
+      </component>
+      <component id="b87ab" class="javax.swing.JButton" binding="declarePositiveHealthStatus">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <background color="-64000"/>
+          <borderPainted value="false"/>
+          <contentAreaFilled value="true"/>
+          <focusPainted value="false"/>
+          <foreground color="-1"/>
+          <hideActionText value="false"/>
+          <opaque value="true"/>
+          <text value="Declare POSITIVE status!"/>
         </properties>
       </component>
     </children>

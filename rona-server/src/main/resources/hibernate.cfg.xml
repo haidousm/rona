@@ -5,7 +5,7 @@
     <session-factory>
         <!-- JDBC Database connection settings -->
         <property name="connection.driver_class">org.h2.Driver</property>
-        <property name="connection.url">jdbc:h2:file:./testDB;AUTO_SERVER=TRUE</property>
+        <property name="connection.url">jdbc:h2:file:./rona-server/src/main/resources/serverDB;AUTO_SERVER=TRUE</property>
         <property name="connection.username">admin</property>
         <property name="connection.password"></property>
         <!-- JDBC connection pool settings ... using built-in test pool -->
@@ -18,7 +18,7 @@
         <property name="current_session_context_class">thread</property>
         <property name="hibernate.enable_lazy_load_no_trans">true</property>
         <!-- Drop and re-create the database schema on startup -->
-        <property name="hbm2ddl.auto">create</property>
+<!--        <property name="hbm2ddl.auto">create</property>-->
         <!-- dbcp connection pool configuration -->
         <property name="hibernate.dbcp.initialSize">5</property>
         <property name="hibernate.dbcp.maxTotal">20</property>

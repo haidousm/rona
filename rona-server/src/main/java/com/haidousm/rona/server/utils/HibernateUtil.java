@@ -34,6 +34,9 @@ public class HibernateUtil {
     }
 
     public static Transaction beginTransaction() {
+        if (getSession().getTransaction().isActive()) {
+            getSession().getTransaction().rollback();
+        }
         return getSession().beginTransaction();
     }
 

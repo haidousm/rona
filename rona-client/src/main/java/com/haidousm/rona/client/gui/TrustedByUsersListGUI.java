@@ -30,6 +30,8 @@ public class TrustedByUsersListGUI extends JFrame {
 
         setLocationRelativeTo(null);
         this.client = client;
+        client.setCurrentFrame(this);
+
 
         backButton.addActionListener(e -> {
             dispose();

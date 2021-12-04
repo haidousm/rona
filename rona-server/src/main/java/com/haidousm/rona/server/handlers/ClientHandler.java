@@ -83,11 +83,8 @@ public class ClientHandler implements Runnable {
             case GET_TRUSTED_BY_USERS:
                 genericResponse = TrustedUsersHandler.handleGetTrustedByUsers(request);
                 break;
-            case GET_ALL_LOCATIONS:
-                genericResponse=LocationHandler.handleGetLocations(request);
-                break;
-            case UPDATE_LOCATION_USERS:
-                genericResponse=LocationHandler.handleUpdateLocations(request);
+            case UPDATE_USER_LOCATION:
+                genericResponse=LocationHandler.handleUpdateUserLocation(request);
                 break;
             case ADD_TRUSTED_USER:
                 genericResponse = TrustedUsersHandler.handleAddTrustedUser(request);

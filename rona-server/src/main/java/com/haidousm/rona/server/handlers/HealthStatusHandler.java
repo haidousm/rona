@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.haidousm.rona.common.entity.HealthStatus;
+import com.haidousm.rona.common.entity.LocationDetails;
 import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.common.enums.Health;
@@ -15,6 +16,8 @@ import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Transaction;
+
+import java.util.List;
 
 public class HealthStatusHandler {
     public static GenericResponse handleGetCurrentUserHealthStatus(GenericRequest request) {
@@ -72,12 +75,49 @@ public class HealthStatusHandler {
                 HealthStatus healthStatus = new HealthStatus(health, currentUser);
                 HibernateUtil.getSession().save(healthStatus);
                 tx.commit();
+
+                if (health == Health.CONTAGIOUS) {
+                    updateNearbyUsersHealthStatus(currentUser);
+                }
+
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
             }
         } else {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
+
         return genericResponse;
     }
+
+    private static void updateNearbyUsersHealthStatus(User currentUser) {
+        Transaction tx = HibernateUtil.beginTransaction();
+        LocationDetails locationDetails = HibernateUtil.getSession().createQuery("from LocationDetails where user = :user and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class).setParameter("user", currentUser).setParameter("minimumTimestamp", System.currentTimeMillis() - (1000 * 60)).setParameter("maximumTimestamp", System.currentTimeMillis()).getSingleResult();
+        if (locationDetails != null) {
+            List<LocationDetails> nearbyLocationDetails = HibernateUtil.getSession().createQuery("from LocationDetails where user != :user and latitude between :minimumLatitude and :maximumLatitude and longitude between :minimumLongitude and :maximumLongitude and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class)
+                    .setParameter("user", currentUser)
+                    .setParameter("minimumLatitude", locationDetails.getLatitude() - 1)
+                    .setParameter("maximumLatitude", locationDetails.getLatitude() + 1)
+                    .setParameter("minimumLongitude", locationDetails.getLongitude() - 1)
+                    .setParameter("maximumLongitude", locationDetails.getLongitude() + 1)
+                    .setParameter("minimumTimestamp", System.currentTimeMillis() - (1000 * 180))
+                    .setParameter("maximumTimestamp", System.currentTimeMillis())
+                    .getResultList();
+            if (nearbyLocationDetails != null) {
+                for (LocationDetails nearbyLocationDetail : nearbyLocationDetails) {
+                    User user = nearbyLocationDetail.getUser();
+                    if (user != null) {
+                        if (user.getHealthStatuses().get(0).getStatus() != Health.CONTAGIOUS) {
+                            HealthStatus healthStatus = new HealthStatus(Health.AT_RISK, nearbyLocationDetail.getUser());
+                            HibernateUtil.getSession().save(healthStatus);
+                        }
+                    }
+                }
+            }
+        }
+
+        tx.commit();
+    }
+
+
 }
