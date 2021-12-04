@@ -145,6 +145,7 @@ public class HomeGUI extends JFrame {
 
     private void handleAddTrustedUserClicked() {
         dispose();
+        client.stopTransmittingLocation();
         new TrustedUsersListGUI("Rona", client).setVisible(true);
 
     }

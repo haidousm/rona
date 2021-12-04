@@ -9,6 +9,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 public class Client {
     private Socket socket;
@@ -16,6 +20,22 @@ public class Client {
     private PrintWriter out;
     private String ip;
     private int port;
+
+    private ScheduledFuture<?> future;
+
+    HashSet<Integer[]> possibleCoords = new HashSet<>() {
+        {
+            add(new Integer[]{0, 0});
+            add(new Integer[]{0, 1});
+            add(new Integer[]{0, 2});
+            add(new Integer[]{1, 0});
+            add(new Integer[]{1, 1});
+            add(new Integer[]{1, 2});
+            add(new Integer[]{2, 0});
+            add(new Integer[]{2, 1});
+            add(new Integer[]{2, 2});
+        }
+    };
 
     private String token = "";
 
@@ -64,5 +84,15 @@ public class Client {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public void beginTransmittingLocation(int interval) {
+        Runnable transmitLocation = () -> System.out.println("Sending location");
+        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
+        this.future = exec.scheduleAtFixedRate(transmitLocation, 0, interval, java.util.concurrent.TimeUnit.SECONDS);
+    }
+
+    public void stopTransmittingLocation() {
+        this.future.cancel(true);
     }
 }

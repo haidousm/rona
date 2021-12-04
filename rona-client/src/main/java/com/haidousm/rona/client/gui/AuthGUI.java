@@ -90,6 +90,7 @@ public class AuthGUI extends JFrame {
         AuthResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
         if (response.getStatus() == Status.SUCCESS) {
             client.setToken(response.getToken());
+            client.beginTransmittingLocation(10);
             goToHome(client);
         } else {
             JOptionPane.showMessageDialog(this, "Login failed");
@@ -107,6 +108,7 @@ public class AuthGUI extends JFrame {
         AuthResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
         if (response.getStatus() == Status.SUCCESS) {
             client.setToken(response.getToken());
+            client.beginTransmittingLocation(10);
             goToHome(client);
         } else {
             JOptionPane.showMessageDialog(this, "Register failed");
