@@ -27,6 +27,7 @@ public class HomeGUI extends JFrame implements NotificationGUI {
     private JButton logOutButton;
     private JButton addTrustedUserButton;
     private JButton declareSafeHealthStatus;
+    private JLabel instructionsLabel;
 
     private final Client client;
     private HealthStatus healthStatus;
@@ -83,10 +84,18 @@ public class HomeGUI extends JFrame implements NotificationGUI {
             declarePositiveHealthStatus.setVisible(false);
             declareSafeHealthStatus.setVisible(true);
             client.stopPollingHealthStatus();
+            instructionsLabel.setText("<html>You should:<br>" +
+                    "1- QUARANTINE for at least 7 days!.<br>" +
+                    "2- Order an at-home PCR Test<br>" +
+                    "3- Keep in touch with a doctor in case of complications</html>");
         } else if (healthStatus.getStatus() == Health.SAFE) {
             declarePositiveHealthStatus.setVisible(true);
             declareSafeHealthStatus.setVisible(false);
             client.pollHealthStatus(60);
+            instructionsLabel.setText("<html>You should:<br>" +
+                    "1- Keep wearing your mask at all times.<br>" +
+                    "2- You should maintain social distancing.<br>" +
+                    "3- Stay Safe!</html>");
         } else {
             declarePositiveHealthStatus.setVisible(true);
             declareSafeHealthStatus.setVisible(true);
@@ -96,8 +105,14 @@ public class HomeGUI extends JFrame implements NotificationGUI {
             client.sendAndReceive(locationRequest);
             client.stopTransmittingLocation();
             client.stopPollingHealthStatus();
+            instructionsLabel.setText("<html>You should:<br>" +
+                    "1- QUARANTINE!.<br>" +
+                    "2- Take a PCR Test.<br>" +
+                    "3- If negative, remain quarantined for 3 days</html>");
         }
+
         statusLabel.setText("Status: " + healthStatus.getStatus().name());
+
     }
 
     private void setupStatsTable() {
@@ -150,6 +165,11 @@ public class HomeGUI extends JFrame implements NotificationGUI {
         declareSafeHealthStatus.setVisible(true);
         declarePositiveHealthStatus.setVisible(false);
         setupStatsTable();
+        instructionsLabel.setText("<html>You should:<br>" +
+                "1- QUARANTINE for at least 7 days!.<br>" +
+                "2- Order an at-home PCR Test<br>" +
+                "3- Keep in touch with a doctor in case of complications</html>");
+
     }
 
     private void handleDeclareSafeStatus() {
@@ -162,6 +182,10 @@ public class HomeGUI extends JFrame implements NotificationGUI {
         declarePositiveHealthStatus.setVisible(true);
         declareSafeHealthStatus.setVisible(false);
         setupStatsTable();
+        instructionsLabel.setText("<html>You should:<br>" +
+                "1- Keep wearing your mask at all times.<br>" +
+                "2- You should maintain social distancing.<br>" +
+                "3- Stay Safe!</html>");
     }
 
     private void handleLogoutClicked() {
@@ -276,6 +300,16 @@ public class HomeGUI extends JFrame implements NotificationGUI {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         mainPane.add(declarePositiveHealthStatus, gbc);
+        instructionsLabel = new JLabel();
+        instructionsLabel.setHorizontalAlignment(0);
+        instructionsLabel.setHorizontalTextPosition(0);
+        instructionsLabel.setText("<html>You should:<br>\" +                 \"1- Keep wearing your mask at all times.<br>\" +                 \"2- You should maintain social distancing.<br>\" +                 \"3- Stay Safe!</html>");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.ipadx = 100;
+        mainPane.add(instructionsLabel, gbc);
     }
 
     /**
