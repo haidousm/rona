@@ -21,7 +21,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrustedUsersListGUI extends JFrame {
+public class TrustedUsersListGUI extends JFrame implements NotificationGUI {
     private JPanel mainPanel;
     private JTable trustedUsersTable;
     private JButton backButton;
@@ -212,4 +212,8 @@ public class TrustedUsersListGUI extends JFrame {
         }
     }
 
+    @Override
+    public void atRisk() {
+        JOptionPane.showMessageDialog(mainPanel, "You are at risk of being infected with the virus. Please begin the quarantine immediately.", "Warning", JOptionPane.WARNING_MESSAGE);
+    }
 }

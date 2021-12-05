@@ -15,6 +15,7 @@ import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.utils.HibernateUtil;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
@@ -34,8 +35,9 @@ public class HealthStatusHandler {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
         String token = authorizedRequest.getToken();
-        Transaction tx = HibernateUtil.beginTransaction();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
@@ -48,6 +50,7 @@ public class HealthStatusHandler {
         } else {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
+        session.close();
         return genericResponse;
     }
 
@@ -65,15 +68,16 @@ public class HealthStatusHandler {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
         String token = authorizedRequest.getToken();
-        Transaction tx = HibernateUtil.beginTransaction();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
                 JsonObject jsonObject = new Gson().fromJson(authorizedRequest.getBody(), JsonObject.class);
                 Health health = Health.valueOf(jsonObject.get("status").getAsString());
                 HealthStatus healthStatus = new HealthStatus(health, currentUser);
-                HibernateUtil.getSession().save(healthStatus);
+                session.save(healthStatus);
                 tx.commit();
 
                 if (health == Health.CONTAGIOUS) {
@@ -87,14 +91,16 @@ public class HealthStatusHandler {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
 
+        session.close();
         return genericResponse;
     }
 
     private static void updateNearbyUsersHealthStatus(User currentUser) {
-        Transaction tx = HibernateUtil.beginTransaction();
-        LocationDetails locationDetails = HibernateUtil.getSession().createQuery("from LocationDetails where user = :user and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class).setParameter("user", currentUser).setParameter("minimumTimestamp", System.currentTimeMillis() - (1000 * 60)).setParameter("maximumTimestamp", System.currentTimeMillis()).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        LocationDetails locationDetails = session.createQuery("from LocationDetails where user = :user and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class).setParameter("user", currentUser).setParameter("minimumTimestamp", System.currentTimeMillis() - (1000 * 60)).setParameter("maximumTimestamp", System.currentTimeMillis()).getSingleResult();
         if (locationDetails != null) {
-            List<LocationDetails> nearbyLocationDetails = HibernateUtil.getSession().createQuery("from LocationDetails where user != :user and latitude between :minimumLatitude and :maximumLatitude and longitude between :minimumLongitude and :maximumLongitude and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class)
+            List<LocationDetails> nearbyLocationDetails = session.createQuery("from LocationDetails where user != :user and latitude between :minimumLatitude and :maximumLatitude and longitude between :minimumLongitude and :maximumLongitude and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class)
                     .setParameter("user", currentUser)
                     .setParameter("minimumLatitude", locationDetails.getLatitude() - 1)
                     .setParameter("maximumLatitude", locationDetails.getLatitude() + 1)
@@ -109,13 +115,13 @@ public class HealthStatusHandler {
                     if (user != null) {
                         if (user.getHealthStatuses().get(0).getStatus() != Health.CONTAGIOUS) {
                             HealthStatus healthStatus = new HealthStatus(Health.AT_RISK, nearbyLocationDetail.getUser());
-                            HibernateUtil.getSession().save(healthStatus);
+                            session.save(healthStatus);
                         }
                     }
                 }
             }
         }
-
+        session.close();
         tx.commit();
     }
 

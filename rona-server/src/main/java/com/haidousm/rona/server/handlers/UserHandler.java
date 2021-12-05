@@ -12,6 +12,7 @@ import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.server.utils.HibernateUtil;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
@@ -32,12 +33,13 @@ public class UserHandler {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
         String token = authorizedRequest.getToken();
-        Transaction tx = HibernateUtil.beginTransaction();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
             JsonObject jsonObject = new Gson().fromJson(authorizedRequest.getBody(), JsonObject.class);
             String username = jsonObject.get("username").getAsString();
-            User user = HibernateUtil.getSession().createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
+            User user = session.createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
             if (user != null) {
                 genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(user));
             } else {
@@ -47,6 +49,7 @@ public class UserHandler {
         } else {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
+        session.close();
         return genericResponse;
     }
 
@@ -63,10 +66,12 @@ public class UserHandler {
     private static GenericResponse getAllUserDetails() {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
-        Transaction tx = HibernateUtil.beginTransaction();
-        List<User> users = HibernateUtil.getSession().createQuery("from User", User.class).getResultList();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List<User> users = session.createQuery("from User", User.class).getResultList();
         tx.commit();
         genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(users));
+        session.close();
         return genericResponse;
     }
 
@@ -84,8 +89,9 @@ public class UserHandler {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
         String token = authorizedRequest.getToken();
-        Transaction tx = HibernateUtil.beginTransaction();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         tx.commit();
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
@@ -97,6 +103,7 @@ public class UserHandler {
         } else {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
+        session.close();
         return genericResponse;
     }
 }

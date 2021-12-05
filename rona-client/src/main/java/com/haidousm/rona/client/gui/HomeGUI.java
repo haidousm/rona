@@ -17,7 +17,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class HomeGUI extends JFrame {
+public class HomeGUI extends JFrame implements NotificationGUI {
     private JLabel welcomeNameLabel;
     private JPanel mainPane;
     private JLabel statusLabel;
@@ -86,6 +86,7 @@ public class HomeGUI extends JFrame {
         } else if (healthStatus.getStatus() == Health.SAFE) {
             declarePositiveHealthStatus.setVisible(true);
             declareSafeHealthStatus.setVisible(false);
+            client.pollHealthStatus(60);
         } else {
             declarePositiveHealthStatus.setVisible(true);
             declareSafeHealthStatus.setVisible(true);
@@ -140,11 +141,11 @@ public class HomeGUI extends JFrame {
         healthStatus.setStatus(Health.CONTAGIOUS);
         statusLabel.setText("Status: " + healthStatus.getStatus().name());
 
-        int randomLat = ThreadLocalRandom.current().nextInt(10, 1000 + 1);
-        int randomLong = ThreadLocalRandom.current().nextInt(10, 1000 + 1);
-        Request locationRequest = AuthorizedRequestsController.prepareUpdateUserLocationRequest(client.getToken(), new Integer[]{randomLat, randomLong});
-        client.sendAndReceive(locationRequest);
-        client.stopTransmittingLocation();
+//        int randomLat = ThreadLocalRandom.current().nextInt(10, 1000 + 1);
+//        int randomLong = ThreadLocalRandom.current().nextInt(10, 1000 + 1);
+//        Request locationRequest = AuthorizedRequestsController.prepareUpdateUserLocationRequest(client.getToken(), new Integer[]{randomLat, randomLong});
+//        client.sendAndReceive(locationRequest);
+//        client.stopTransmittingLocation();
         client.stopPollingHealthStatus();
         declareSafeHealthStatus.setVisible(true);
         declarePositiveHealthStatus.setVisible(false);
@@ -284,4 +285,8 @@ public class HomeGUI extends JFrame {
         return mainPane;
     }
 
+    @Override
+    public void atRisk() {
+        JOptionPane.showMessageDialog(mainPane, "You are at risk of being infected with the virus. Please begin the quarantine immediately.", "Warning", JOptionPane.WARNING_MESSAGE);
+    }
 }

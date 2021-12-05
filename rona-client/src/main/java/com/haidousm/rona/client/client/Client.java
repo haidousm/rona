@@ -3,6 +3,7 @@ package com.haidousm.rona.client.client;
 import com.google.gson.Gson;
 import com.haidousm.rona.client.controllers.AuthorizedRequestsController;
 import com.haidousm.rona.client.gui.HomeGUI;
+import com.haidousm.rona.client.gui.NotificationGUI;
 import com.haidousm.rona.common.entity.HealthStatus;
 import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.requests.GenericRequest;
@@ -54,7 +55,7 @@ public class Client {
 
     private String token = "";
 
-    private JFrame currentFrame;
+    private NotificationGUI currentFrame;
 
     public Client(String ip, int port) throws IOException {
         this.ip = ip;
@@ -129,10 +130,8 @@ public class Client {
                 Request request = AuthorizedRequestsController.prepareGetHealthStatusRequest(token);
                 HealthStatus healthStatus = HealthStatusResponseBuilder.builder().build(this.sendAndReceive(request));
                 if (healthStatus.getStatus() == Health.AT_RISK || healthStatus.getStatus() == Health.CONTAGIOUS) {
-                    JOptionPane.showMessageDialog(currentFrame, "You are at risk! Please begin quarantine!", "Warning", JOptionPane.WARNING_MESSAGE);
-                    this.currentFrame.dispose();
-                    this.currentFrame = new HomeGUI("Home", this);
-                    this.currentFrame.setVisible(true);
+
+                    this.currentFrame.atRisk();
                     this.stopPollingHealthStatus();
                     Thread.currentThread().interrupt();
                 }
@@ -151,11 +150,11 @@ public class Client {
         }
     }
 
-    public void setCurrentFrame(JFrame currentFrame) {
+    public void setCurrentFrame(NotificationGUI currentFrame) {
         this.currentFrame = currentFrame;
     }
 
-    public JFrame getCurrentFrame() {
+    public NotificationGUI getCurrentFrame() {
         return currentFrame;
     }
 }

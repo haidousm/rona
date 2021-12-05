@@ -29,16 +29,6 @@ public class HibernateUtil {
         return sessionFactory;
     }
 
-    public static Session getSession() {
-        return getSessionFactory().getCurrentSession();
-    }
-
-    public static Transaction beginTransaction() {
-        if (getSession().getTransaction().isActive()) {
-            getSession().getTransaction().rollback();
-        }
-        return getSession().beginTransaction();
-    }
 
     public static void shutdown() {
         if (register != null) {

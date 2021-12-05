@@ -13,7 +13,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class AuthGUI extends JFrame {
+public class AuthGUI extends JFrame implements NotificationGUI {
     private JTextField usernameTextField;
     private JPasswordField passwordTextField;
     private JButton loginButton;
@@ -92,7 +92,6 @@ public class AuthGUI extends JFrame {
         if (response.getStatus() == Status.SUCCESS) {
             client.setToken(response.getToken());
             client.beginTransmittingLocation(60);
-            client.pollHealthStatus(60);
             goToHome(client);
         } else {
             JOptionPane.showMessageDialog(this, "Login failed");
@@ -344,5 +343,10 @@ public class AuthGUI extends JFrame {
      */
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
+    }
+
+    @Override
+    public void atRisk() {
+        JOptionPane.showMessageDialog(mainPanel, "You are at risk of being infected with the virus. Please begin the quarantine immediately.", "Warning", JOptionPane.WARNING_MESSAGE);
     }
 }

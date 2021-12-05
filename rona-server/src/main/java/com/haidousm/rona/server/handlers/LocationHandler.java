@@ -11,6 +11,7 @@ import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.utils.HibernateUtil;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class LocationHandler {
@@ -29,14 +30,15 @@ public class LocationHandler {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
         String token = authorizedRequest.getToken();
-        Transaction tx = HibernateUtil.beginTransaction();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
                 JsonObject jsonObject = new Gson().fromJson(authorizedRequest.getBody(), JsonObject.class);
                 LocationDetails locationDetails = new LocationDetails(jsonObject.get("longitude").getAsDouble(), jsonObject.get("latitude").getAsDouble(), System.currentTimeMillis(), currentUser);
-                HibernateUtil.getSession().save(locationDetails);
+                session.save(locationDetails);
                 tx.commit();
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
@@ -44,6 +46,7 @@ public class LocationHandler {
         } else {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
+        session.close();
         return genericResponse;
     }
 }
