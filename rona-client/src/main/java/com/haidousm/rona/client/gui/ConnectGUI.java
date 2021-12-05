@@ -133,5 +133,4 @@ public class ConnectGUI extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

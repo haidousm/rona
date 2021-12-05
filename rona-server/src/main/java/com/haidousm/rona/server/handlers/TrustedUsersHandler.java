@@ -13,6 +13,7 @@ import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.utils.HibernateUtil;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.Collections;
@@ -34,8 +35,9 @@ public class TrustedUsersHandler {
         genericResponse.setStatus(Status.SUCCESS);
 
         String token = request.getToken();
-        Transaction tx = HibernateUtil.beginTransaction();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
@@ -52,6 +54,7 @@ public class TrustedUsersHandler {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
 
+        session.close();
         return genericResponse;
     }
 
@@ -70,17 +73,18 @@ public class TrustedUsersHandler {
         genericResponse.setStatus(Status.SUCCESS);
 
         String token = request.getToken();
-        Transaction tx = HibernateUtil.beginTransaction();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
                 String username = new Gson().fromJson(request.getBody(), JsonObject.class).get("username").getAsString();
-                User user = HibernateUtil.getSession().createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
+                User user = session.createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
                 if (user != null) {
                     if (!currentUser.getTrustedUsers().contains(user)) {
                         currentUser.getTrustedUsers().add(user);
-                        HibernateUtil.getSession().update(currentUser);
+                        session.update(currentUser);
                         tx.commit();
                     } else {
                         genericResponse.setStatus(Status.BAD_REQUEST);
@@ -95,7 +99,7 @@ public class TrustedUsersHandler {
         } else {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
-
+        session.close();
         return genericResponse;
     }
 
@@ -114,8 +118,9 @@ public class TrustedUsersHandler {
         genericResponse.setStatus(Status.SUCCESS);
 
         String token = request.getToken();
-        Transaction tx = HibernateUtil.beginTransaction();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
@@ -128,7 +133,7 @@ public class TrustedUsersHandler {
         } else {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
-
+        session.close();
         return genericResponse;
     }
 
@@ -146,18 +151,19 @@ public class TrustedUsersHandler {
         GenericResponse genericResponse = new GenericResponse();
         genericResponse.setStatus(Status.SUCCESS);
 
-        Transaction tx = HibernateUtil.beginTransaction();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
         String token = request.getToken();
-        UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
+        UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
                 String username = new Gson().fromJson(request.getBody(), JsonObject.class).get("username").getAsString();
-                User user = HibernateUtil.getSession().createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
+                User user = session.createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
                 if (user != null) {
                     if (currentUser.getTrustedUsers().contains(user)) {
                         currentUser.getTrustedUsers().remove(user);
-                        HibernateUtil.getSession().update(currentUser);
+                        session.update(currentUser);
                         tx.commit();
                     } else {
                         genericResponse.setStatus(Status.BAD_REQUEST);
@@ -172,7 +178,7 @@ public class TrustedUsersHandler {
         } else {
             genericResponse.setStatus(Status.UNAUTHORIZED);
         }
-
+        session.close();
         return genericResponse;
     }
 }

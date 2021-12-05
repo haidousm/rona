@@ -15,7 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrustedByUsersListGUI extends JFrame {
+public class TrustedByUsersListGUI extends JFrame implements NotificationGUI {
     private JPanel mainPanel;
     private JTable trustedByUsersTable;
     private JButton backButton;
@@ -30,6 +30,8 @@ public class TrustedByUsersListGUI extends JFrame {
 
         setLocationRelativeTo(null);
         this.client = client;
+        client.setCurrentFrame(this);
+
 
         backButton.addActionListener(e -> {
             dispose();
@@ -105,5 +107,10 @@ public class TrustedByUsersListGUI extends JFrame {
      */
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
+    }
+
+    @Override
+    public void atRisk() {
+        JOptionPane.showMessageDialog(mainPanel, "You are at risk of being infected with the virus. Please begin the quarantine immediately.", "Warning", JOptionPane.WARNING_MESSAGE);
     }
 }

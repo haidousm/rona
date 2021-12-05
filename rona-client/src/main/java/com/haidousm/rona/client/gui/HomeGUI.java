@@ -15,34 +15,45 @@ import com.haidousm.rona.common.responses.builders.UserResponseBuilder;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class HomeGUI extends JFrame {
+public class HomeGUI extends JFrame implements NotificationGUI {
     private JLabel welcomeNameLabel;
     private JPanel mainPane;
     private JLabel statusLabel;
-    private JButton declareHealthStatusButton;
+    private JButton declarePositiveHealthStatus;
     private JTable statsTable;
     private JButton friendsAndFamilyButton;
     private JButton logOutButton;
     private JButton addTrustedUserButton;
+    private JButton declareSafeHealthStatus;
+    private JLabel instructionsLabel;
 
     private final Client client;
     private HealthStatus healthStatus;
 
     public HomeGUI(String name, Client client) {
         super(name);
+        $$$setupUI$$$();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setContentPane(mainPane);
         pack();
         setLocationRelativeTo(null);
         this.client = client;
 
+        client.setCurrentFrame(this);
+
+
         setupWelcomeMessage();
         setupHealthStatus();
         setupStatsTable();
 
-        declareHealthStatusButton.addActionListener(e -> {
-            handleDeclareHealthStatusClicked();
+        declarePositiveHealthStatus.addActionListener(e -> {
+            handleDeclarePositiveStatus();
+        });
+
+        declareSafeHealthStatus.addActionListener(e -> {
+            handleDeclareSafeStatus();
         });
 
         logOutButton.addActionListener(e -> {
@@ -70,13 +81,38 @@ public class HomeGUI extends JFrame {
         HealthStatus healthStatus = HealthStatusResponseBuilder.builder().build(client.sendAndReceive(request));
         this.healthStatus = healthStatus;
         if (healthStatus.getStatus() == Health.CONTAGIOUS) {
-            declareHealthStatusButton.setBackground(Color.GREEN);
-            declareHealthStatusButton.setText("I'm SAFE!");
+            declarePositiveHealthStatus.setVisible(false);
+            declareSafeHealthStatus.setVisible(true);
+            client.stopPollingHealthStatus();
+            instructionsLabel.setText("<html>You should:<br>" +
+                    "1- QUARANTINE for at least 7 days!.<br>" +
+                    "2- Order an at-home PCR Test<br>" +
+                    "3- Keep in touch with a doctor in case of complications</html>");
+        } else if (healthStatus.getStatus() == Health.SAFE) {
+            declarePositiveHealthStatus.setVisible(true);
+            declareSafeHealthStatus.setVisible(false);
+            client.pollHealthStatus(60);
+            instructionsLabel.setText("<html>You should:<br>" +
+                    "1- Keep wearing your mask at all times.<br>" +
+                    "2- You should maintain social distancing.<br>" +
+                    "3- Stay Safe!</html>");
         } else {
-            declareHealthStatusButton.setBackground(Color.RED);
-            declareHealthStatusButton.setText("I'm POSITIVE!");
+            declarePositiveHealthStatus.setVisible(true);
+            declareSafeHealthStatus.setVisible(true);
+            int randomLat = ThreadLocalRandom.current().nextInt(10, 1000 + 1);
+            int randomLong = ThreadLocalRandom.current().nextInt(10, 1000 + 1);
+            Request locationRequest = AuthorizedRequestsController.prepareUpdateUserLocationRequest(client.getToken(), new Integer[]{randomLat, randomLong});
+            client.sendAndReceive(locationRequest);
+            client.stopTransmittingLocation();
+            client.stopPollingHealthStatus();
+            instructionsLabel.setText("<html>You should:<br>" +
+                    "1- QUARANTINE!.<br>" +
+                    "2- Take a PCR Test.<br>" +
+                    "3- If negative, remain quarantined for 3 days</html>");
         }
+
         statusLabel.setText("Status: " + healthStatus.getStatus().name());
+
     }
 
     private void setupStatsTable() {
@@ -114,27 +150,42 @@ public class HomeGUI extends JFrame {
 
     }
 
-    private void handleDeclareHealthStatusClicked() {
-        Request request;
-        if (healthStatus.getStatus() == Health.CONTAGIOUS) {
-            request = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.SAFE);
-            healthStatus.setStatus(Health.SAFE);
-        } else {
-            request = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.CONTAGIOUS);
-            healthStatus.setStatus(Health.CONTAGIOUS);
-
-        }
+    private void handleDeclarePositiveStatus() {
+        Request request = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.CONTAGIOUS);
         client.sendAndReceive(request);
+        healthStatus.setStatus(Health.CONTAGIOUS);
         statusLabel.setText("Status: " + healthStatus.getStatus().name());
-        if (healthStatus.getStatus() == Health.CONTAGIOUS) {
-            declareHealthStatusButton.setBackground(Color.GREEN);
-            declareHealthStatusButton.setText("I'm SAFE!");
-        } else {
-            declareHealthStatusButton.setBackground(Color.RED);
-            declareHealthStatusButton.setText("I'm POSITIVE!");
-        }
 
+//        int randomLat = ThreadLocalRandom.current().nextInt(10, 1000 + 1);
+//        int randomLong = ThreadLocalRandom.current().nextInt(10, 1000 + 1);
+//        Request locationRequest = AuthorizedRequestsController.prepareUpdateUserLocationRequest(client.getToken(), new Integer[]{randomLat, randomLong});
+//        client.sendAndReceive(locationRequest);
+//        client.stopTransmittingLocation();
+        client.stopPollingHealthStatus();
+        declareSafeHealthStatus.setVisible(true);
+        declarePositiveHealthStatus.setVisible(false);
         setupStatsTable();
+        instructionsLabel.setText("<html>You should:<br>" +
+                "1- QUARANTINE for at least 7 days!.<br>" +
+                "2- Order an at-home PCR Test<br>" +
+                "3- Keep in touch with a doctor in case of complications</html>");
+
+    }
+
+    private void handleDeclareSafeStatus() {
+        Request request = AuthorizedRequestsController.prepareUpdateHealthStatusRequest(client.getToken(), Health.SAFE);
+        client.sendAndReceive(request);
+        healthStatus.setStatus(Health.SAFE);
+        statusLabel.setText("Status: " + healthStatus.getStatus().name());
+        client.pollHealthStatus(60);
+        client.beginTransmittingLocation(60);
+        declarePositiveHealthStatus.setVisible(true);
+        declareSafeHealthStatus.setVisible(false);
+        setupStatsTable();
+        instructionsLabel.setText("<html>You should:<br>" +
+                "1- Keep wearing your mask at all times.<br>" +
+                "2- You should maintain social distancing.<br>" +
+                "3- Stay Safe!</html>");
     }
 
     private void handleLogoutClicked() {
@@ -145,6 +196,7 @@ public class HomeGUI extends JFrame {
 
     private void handleAddTrustedUserClicked() {
         dispose();
+        client.stopTransmittingLocation();
         new TrustedUsersListGUI("Rona", client).setVisible(true);
 
     }
@@ -159,11 +211,8 @@ public class HomeGUI extends JFrame {
         return new Insets(50, 25, 25, 50);
     }
 
-    {
-// GUI initializer generated by IntelliJ IDEA GUI Designer
-// >>> IMPORTANT!! <<<
-// DO NOT EDIT OR ADD ANY CODE HERE!
-        $$$setupUI$$$();
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 
     /**
@@ -176,66 +225,91 @@ public class HomeGUI extends JFrame {
     private void $$$setupUI$$$() {
         mainPane = new JPanel();
         mainPane.setLayout(new GridBagLayout());
-        welcomeNameLabel = new JLabel();
-        welcomeNameLabel.setText("Label");
+        friendsAndFamilyButton = new JButton();
+        friendsAndFamilyButton.setText("Friends and Family");
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        mainPane.add(welcomeNameLabel, gbc);
-        friendsAndFamilyButton = new JButton();
-        friendsAndFamilyButton.setText("Friends and Family");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         mainPane.add(friendsAndFamilyButton, gbc);
-        declareHealthStatusButton = new JButton();
-        declareHealthStatusButton.setBackground(new Color(-64000));
-        declareHealthStatusButton.setBorderPainted(false);
-        declareHealthStatusButton.setContentAreaFilled(true);
-        declareHealthStatusButton.setFocusPainted(false);
-        declareHealthStatusButton.setForeground(new Color(-1));
-        declareHealthStatusButton.setHideActionText(false);
-        declareHealthStatusButton.setOpaque(true);
-        declareHealthStatusButton.setText("I'm POSITIVE!");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        mainPane.add(declareHealthStatusButton, gbc);
         final JScrollPane scrollPane1 = new JScrollPane();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 4;
+        gbc.gridy = 3;
         gbc.gridheight = 2;
         gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         mainPane.add(scrollPane1, gbc);
         statsTable = new JTable();
         scrollPane1.setViewportView(statsTable);
-        statusLabel = new JLabel();
-        statusLabel.setText("Status: ");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        mainPane.add(statusLabel, gbc);
         logOutButton = new JButton();
         logOutButton.setText("Log out");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         mainPane.add(logOutButton, gbc);
         addTrustedUserButton = new JButton();
         addTrustedUserButton.setText("Add Trusted User");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         mainPane.add(addTrustedUserButton, gbc);
+        statusLabel = new JLabel();
+        statusLabel.setText("Status: ");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        mainPane.add(statusLabel, gbc);
+        welcomeNameLabel = new JLabel();
+        welcomeNameLabel.setText("Label");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        mainPane.add(welcomeNameLabel, gbc);
+        declareSafeHealthStatus = new JButton();
+        declareSafeHealthStatus.setBackground(new Color(-16711936));
+        declareSafeHealthStatus.setBorderPainted(false);
+        declareSafeHealthStatus.setContentAreaFilled(true);
+        declareSafeHealthStatus.setFocusPainted(false);
+        declareSafeHealthStatus.setForeground(new Color(-1));
+        declareSafeHealthStatus.setHideActionText(false);
+        declareSafeHealthStatus.setOpaque(true);
+        declareSafeHealthStatus.setText("Declare SAFE status!");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        mainPane.add(declareSafeHealthStatus, gbc);
+        declarePositiveHealthStatus = new JButton();
+        declarePositiveHealthStatus.setBackground(new Color(-64000));
+        declarePositiveHealthStatus.setBorderPainted(false);
+        declarePositiveHealthStatus.setContentAreaFilled(true);
+        declarePositiveHealthStatus.setFocusPainted(false);
+        declarePositiveHealthStatus.setForeground(new Color(-1));
+        declarePositiveHealthStatus.setHideActionText(false);
+        declarePositiveHealthStatus.setOpaque(true);
+        declarePositiveHealthStatus.setText("Declare POSITIVE status!");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        mainPane.add(declarePositiveHealthStatus, gbc);
+        instructionsLabel = new JLabel();
+        instructionsLabel.setHorizontalAlignment(0);
+        instructionsLabel.setHorizontalTextPosition(0);
+        instructionsLabel.setText("<html>You should:<br>\" +                 \"1- Keep wearing your mask at all times.<br>\" +                 \"2- You should maintain social distancing.<br>\" +                 \"3- Stay Safe!</html>");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.ipadx = 100;
+        mainPane.add(instructionsLabel, gbc);
     }
 
     /**
@@ -245,4 +319,8 @@ public class HomeGUI extends JFrame {
         return mainPane;
     }
 
+    @Override
+    public void atRisk() {
+        JOptionPane.showMessageDialog(mainPane, "You are at risk of being infected with the virus. Please begin the quarantine immediately.", "Warning", JOptionPane.WARNING_MESSAGE);
+    }
 }

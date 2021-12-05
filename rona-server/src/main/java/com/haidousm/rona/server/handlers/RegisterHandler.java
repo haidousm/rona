@@ -16,6 +16,7 @@ import com.haidousm.rona.common.requests.RegisterRequest;
 import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import com.haidousm.rona.common.utils.MiscUtils;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.nio.file.Path;
@@ -58,25 +59,26 @@ public class RegisterHandler {
 
             User newUser = new User(registerRequest.getFirstname(), registerRequest.getLastname(), registerRequest.getEmail(), registerRequest.getUsername(), registerRequest.getPassword(), registerRequest.isVaccinated(), vaccineCertificateFilePath.toString(), imageFilePath.toString());
 
-            Transaction tx = HibernateUtil.beginTransaction();
-            HibernateUtil.getSession().save(newUser);
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            session.save(newUser);
             tx.commit();
-
 
             String token = LoginHandler.generateAuthToken(32);
             long expiryTimestamp = System.currentTimeMillis() + 604800000;
 
-            tx = HibernateUtil.beginTransaction();
+            tx = session.beginTransaction();
 
             HealthStatus healthStatus = new HealthStatus(Health.SAFE, newUser);
             ConnectionDetails connectionDetails = new ConnectionDetails(registerRequest.getIPAddress(), registerRequest.getPort(), newUser);
             UserAuthToken userAuthToken = new UserAuthToken(token, expiryTimestamp, newUser);
-            HibernateUtil.getSession().save(userAuthToken);
-            HibernateUtil.getSession().save(healthStatus);
-            HibernateUtil.getSession().save(connectionDetails);
+            session.save(userAuthToken);
+            session.save(healthStatus);
+            session.save(connectionDetails);
             tx.commit();
             authResponse = AuthResponseBuilder.builder().setToken(token).setExpiryTimestamp(expiryTimestamp).build();
             authResponse.setStatus(Status.SUCCESS);
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
             authResponse.setStatus(Status.BAD_REQUEST);

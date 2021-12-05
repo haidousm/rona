@@ -12,6 +12,7 @@ import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.responses.StatsResponse;
 import com.haidousm.rona.common.responses.builders.StatsResponseBuilder;
 import com.haidousm.rona.server.utils.HibernateUtil;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
@@ -31,11 +32,13 @@ public class StatsHandler {
 
     private static StatsResponse getStats(AuthorizedRequest request) {
         StatsResponse statsResponse = StatsResponseBuilder.builder().build();
-        Transaction tx = HibernateUtil.beginTransaction();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
         try {
-            UserAuthToken userAuthToken = HibernateUtil.getSession().createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", request.getToken()).getSingleResult();
+            UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", request.getToken()).getSingleResult();
             if (userAuthToken == null) {
                 statsResponse.setStatus(Status.UNAUTHORIZED);
+                session.close();
                 return statsResponse;
             }
             int numberOfSafeAndVaccinatedUsers = 0;
@@ -44,7 +47,8 @@ public class StatsHandler {
             int numberOfAtRiskAndUnVaccinatedUsers = 0;
             int numberOfContagiousAndVaccinatedUsers = 0;
             int numberOfContagiousAndUnVaccinatedUsers = 0;
-            List<User> users = HibernateUtil.getSession().createQuery("from User", User.class).getResultList();
+            List<User> users = session.createQuery("from User", User.class).getResultList();
+            tx.commit();
 
             for (User user : users) {
                 if (user.getHealthStatuses().get(0).getStatus() == Health.SAFE && user.getIsVaccinated()) {
@@ -63,8 +67,8 @@ public class StatsHandler {
             }
 
             statsResponse = StatsResponseBuilder.builder().setNumberOfSafeAndVaccinatedUsers(numberOfSafeAndVaccinatedUsers).setNumberOfSafeAndUnVaccinatedUsers(numberOfSafeAndUnVaccinatedUsers).setNumberOfAtRiskAndVaccinatedUsers(numberOfAtRiskAndVaccinatedUsers).setNumberOfAtRiskAndUnVaccinatedUsers(numberOfAtRiskAndUnVaccinatedUsers).setNumberOfContagiousAndVaccinatedUsers(numberOfContagiousAndVaccinatedUsers).setNumberOfContagiousAndUnVaccinatedUsers(numberOfContagiousAndUnVaccinatedUsers).build();
-            tx.commit();
             statsResponse.setStatus(Status.SUCCESS);
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
             statsResponse.setStatus(Status.BAD_REQUEST);
