@@ -11,7 +11,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class HomePage extends JFrame implements NotificationGUI {
+public class HomePage extends JFrame implements Notifications {
     private JLabel welcomeNameLabel;
     private JPanel mainPane;
     private JLabel statusLabel;
@@ -24,7 +24,6 @@ public class HomePage extends JFrame implements NotificationGUI {
     private JLabel instructionsLabel;
 
     private final Client client;
-    private HealthStatus healthStatus;
 
     public HomePage(String name, Client client) {
         super(name);
@@ -71,7 +70,7 @@ public class HomePage extends JFrame implements NotificationGUI {
 
     private void setupHealthStatus() {
         HealthStatus healthStatus = ClientController.getUserHealthStatus(client);
-        this.healthStatus = healthStatus;
+        client.setHealthStatus(healthStatus);
         if (healthStatus.getStatus() == Health.CONTAGIOUS) {
             declarePositiveHealthStatus.setVisible(false);
             declareSafeHealthStatus.setVisible(true);
@@ -135,8 +134,9 @@ public class HomePage extends JFrame implements NotificationGUI {
 
     private void handleDeclarePositiveStatus() {
         ClientController.updateUserHealthStatus(client, Health.CONTAGIOUS);
-        healthStatus.setStatus(Health.CONTAGIOUS);
-        statusLabel.setText("Status: " + healthStatus.getStatus().name());
+
+        client.getHealthStatus().setStatus(Health.CONTAGIOUS);
+        statusLabel.setText("Status: " + client.getHealthStatus().getStatus().name());
 
         declareSafeHealthStatus.setVisible(true);
         declarePositiveHealthStatus.setVisible(false);
@@ -150,8 +150,8 @@ public class HomePage extends JFrame implements NotificationGUI {
 
     private void handleDeclareSafeStatus() {
         ClientController.updateUserHealthStatus(client, Health.SAFE);
-        healthStatus.setStatus(Health.SAFE);
-        statusLabel.setText("Status: " + healthStatus.getStatus().name());
+        client.getHealthStatus().setStatus(Health.SAFE);
+        statusLabel.setText("Status: " + client.getHealthStatus().getStatus().name());
         declarePositiveHealthStatus.setVisible(true);
         declareSafeHealthStatus.setVisible(false);
         setupStatsTable();
@@ -176,6 +176,28 @@ public class HomePage extends JFrame implements NotificationGUI {
     private void handleFriendsAndFamilyClicked() {
         dispose();
         new FriendsAndFamilyPage("Rona", client).setVisible(true);
+    }
+
+    @Override
+    public void pollHealthStatus() {
+        HealthStatus healthStatus = ClientController.getUserHealthStatus(client);
+        if (healthStatus.getStatus() == this.client.getHealthStatus().getStatus()) {
+            return;
+        }
+        if (healthStatus.getStatus() == Health.AT_RISK) {
+            JOptionPane.showMessageDialog(this, "You are at risk! Please begin quarantine immediately!", "Warning", JOptionPane.WARNING_MESSAGE);
+            setupHealthStatus();
+            setupStatsTable();
+        } else if (healthStatus.getStatus() == Health.SAFE) {
+            JOptionPane.showMessageDialog(this, "You are safe! Please continue to maintain social distancing!", "Warning", JOptionPane.WARNING_MESSAGE);
+            setupHealthStatus();
+            setupStatsTable();
+        }
+    }
+
+    @Override
+    public void transmitCurrentLocation() {
+        ClientController.updateUserLocation(client, client.getCurrentLocation());
     }
 
     @Override
@@ -289,10 +311,5 @@ public class HomePage extends JFrame implements NotificationGUI {
      */
     public JComponent $$$getRootComponent$$$() {
         return mainPane;
-    }
-
-    @Override
-    public void atRisk() {
-        JOptionPane.showMessageDialog(mainPane, "You are at risk of being infected with the virus. Please begin the quarantine immediately.", "Warning", JOptionPane.WARNING_MESSAGE);
     }
 }

@@ -17,6 +17,7 @@ import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.Collections;
 import java.util.List;
 
 public class HealthStatusHandler {
@@ -99,7 +100,9 @@ public class HealthStatusHandler {
     private static void updateNearbyUsersHealthStatus(User currentUser) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
-        LocationDetails locationDetails = session.createQuery("from LocationDetails where user = :user and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class).setParameter("user", currentUser).setParameter("minimumTimestamp", System.currentTimeMillis() - (1000 * 60)).setParameter("maximumTimestamp", System.currentTimeMillis()).getSingleResult();
+        List<LocationDetails> locationDetailsList = session.createQuery("from LocationDetails where user = :user and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class).setParameter("user", currentUser).setParameter("minimumTimestamp", System.currentTimeMillis() - (1000 * 180)).setParameter("maximumTimestamp", System.currentTimeMillis()).getResultList();
+        Collections.reverse(locationDetailsList);
+        LocationDetails locationDetails = locationDetailsList.get(0);
         if (locationDetails != null) {
             List<LocationDetails> nearbyLocationDetails = session.createQuery("from LocationDetails where user != :user and latitude between :minimumLatitude and :maximumLatitude and longitude between :minimumLongitude and :maximumLongitude and timestamp between :minimumTimestamp and :maximumTimestamp", LocationDetails.class)
                     .setParameter("user", currentUser)
@@ -114,7 +117,7 @@ public class HealthStatusHandler {
                 for (LocationDetails nearbyLocationDetail : nearbyLocationDetails) {
                     User user = nearbyLocationDetail.getUser();
                     if (user != null) {
-                        if (user.getHealthStatuses().get(0).getStatus() != Health.CONTAGIOUS) {
+                        if (user.getHealthStatuses().get(0).getStatus() != Health.CONTAGIOUS || user.getHealthStatuses().get(0).getStatus() != Health.AT_RISK) {
                             HealthStatus healthStatus = new HealthStatus(Health.AT_RISK, nearbyLocationDetail.getUser());
                             session.save(healthStatus);
                         }

@@ -3,7 +3,9 @@ package com.haidousm.rona.client.gui;
 import com.google.gson.JsonObject;
 import com.haidousm.rona.client.client.Client;
 import com.haidousm.rona.client.controllers.ClientController;
+import com.haidousm.rona.common.entity.HealthStatus;
 import com.haidousm.rona.common.entity.User;
+import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
@@ -20,7 +22,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrustedUsersPage extends JFrame implements NotificationGUI {
+public class TrustedUsersPage extends JFrame implements Notifications {
     private JPanel mainPanel;
     private JTable trustedUsersTable;
     private JButton backButton;
@@ -113,6 +115,24 @@ public class TrustedUsersPage extends JFrame implements NotificationGUI {
         }
     }
 
+    @Override
+    public void pollHealthStatus() {
+        HealthStatus healthStatus = ClientController.getUserHealthStatus(client);
+        if (healthStatus.getStatus() == this.client.getHealthStatus().getStatus()) {
+            return;
+        }
+        if (healthStatus.getStatus() == Health.AT_RISK) {
+            JOptionPane.showMessageDialog(this, "You are at risk! Please begin quarantine immediately!", "Warning", JOptionPane.WARNING_MESSAGE);
+
+        } else if (healthStatus.getStatus() == Health.SAFE) {
+            JOptionPane.showMessageDialog(this, "You are safe! Please continue to maintain social distancing!", "Warning", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    @Override
+    public void transmitCurrentLocation() {
+        ClientController.updateUserLocation(client, client.getCurrentLocation());
+    }
 
     @Override
     public Insets getInsets() {
@@ -208,10 +228,5 @@ public class TrustedUsersPage extends JFrame implements NotificationGUI {
                 }
             }
         }
-    }
-
-    @Override
-    public void atRisk() {
-        JOptionPane.showMessageDialog(mainPanel, "You are at risk of being infected with the virus. Please begin the quarantine immediately.", "Warning", JOptionPane.WARNING_MESSAGE);
     }
 }

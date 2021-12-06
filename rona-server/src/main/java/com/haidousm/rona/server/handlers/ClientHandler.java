@@ -1,6 +1,5 @@
 package com.haidousm.rona.server.handlers;
 
-import com.google.gson.Gson;
 import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.enums.Status;
@@ -77,6 +76,7 @@ public class ClientHandler implements Runnable {
          * The handlers are responsible for handling the request and returning a response
          * they are the ones that know the contents of the request
          */
+
         GenericResponse genericResponse;
         switch (request.getMethod()) {
             case LOGIN:

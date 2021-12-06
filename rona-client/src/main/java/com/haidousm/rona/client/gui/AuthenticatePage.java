@@ -11,7 +11,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class AuthenticatePage extends JFrame implements NotificationGUI {
+public class AuthenticatePage extends JFrame {
     private JTextField usernameTextField;
     private JPasswordField passwordTextField;
     private JButton loginButton;
@@ -38,7 +38,6 @@ public class AuthenticatePage extends JFrame implements NotificationGUI {
         pack();
 
         setLocationRelativeTo(null);
-        client.setCurrentFrame(this);
 
         this.client = client;
 
@@ -91,7 +90,7 @@ public class AuthenticatePage extends JFrame implements NotificationGUI {
         String firstName = firstNameTextField.getText();
         String lastName = lastNameTextField.getText();
         boolean isVaccinated = isVaccinatedCheckbox.isSelected();
-        TokenResponse response = ClientController.registerUser(client, username, password, email, firstName, lastName, isVaccinated, pdfFilePath, imageFilePath);
+        TokenResponse response = ClientController.registerUser(client, firstName, lastName, email, username, password, isVaccinated, pdfFilePath, imageFilePath);
         if (response.getStatus() == Status.SUCCESS) {
             client.setToken(response.getToken());
             goToHome(client);
@@ -329,8 +328,4 @@ public class AuthenticatePage extends JFrame implements NotificationGUI {
         return mainPanel;
     }
 
-    @Override
-    public void atRisk() {
-        JOptionPane.showMessageDialog(mainPanel, "You are at risk of being infected with the virus. Please begin the quarantine immediately.", "Warning", JOptionPane.WARNING_MESSAGE);
-    }
 }
