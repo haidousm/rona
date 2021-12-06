@@ -1,17 +1,13 @@
 package com.haidousm.rona.server.handlers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.haidousm.rona.common.entity.HealthStatus;
 import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.requests.GenericRequest;
-import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
+import com.haidousm.rona.common.utils.MiscUtils;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -23,7 +19,8 @@ public class TrustedUsersHandler {
     public static GenericResponse handleGetTrustedUsers(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = getTrustedUsers(AuthorizedRequestBuilder.builder().build(request.getBody()));
+            AuthorizedRequest authorizedRequest = MiscUtils.fromJson(request.getBody(), AuthorizedRequest.class);
+            genericResponse = getTrustedUsers(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -45,7 +42,7 @@ public class TrustedUsersHandler {
                 if (trustedUsers == null) {
                     trustedUsers = Collections.emptyList();
                 }
-                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(trustedUsers));
+                genericResponse.setResponse(MiscUtils.toJson(trustedUsers));
                 tx.commit();
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
@@ -61,7 +58,8 @@ public class TrustedUsersHandler {
     public static GenericResponse handleAddTrustedUser(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = addTrustedUser(AuthorizedRequestBuilder.builder().build(request.getBody()));
+            AuthorizedRequest authorizedRequest = MiscUtils.fromJson(request.getBody(), AuthorizedRequest.class);
+            genericResponse = addTrustedUser(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -79,7 +77,7 @@ public class TrustedUsersHandler {
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
-                String username = new Gson().fromJson(request.getBody(), JsonObject.class).get("username").getAsString();
+                String username = ((JsonObject) MiscUtils.fromJson(request.getBody(), JsonObject.class)).get("username").getAsString();
                 User user = session.createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
                 if (user != null) {
                     if (!currentUser.getTrustedUsers().contains(user)) {
@@ -106,7 +104,8 @@ public class TrustedUsersHandler {
     public static GenericResponse handleGetTrustedByUsers(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = getTrustedByUsers(AuthorizedRequestBuilder.builder().build(request.getBody()));
+            AuthorizedRequest authorizedRequest = MiscUtils.fromJson(request.getBody(), AuthorizedRequest.class);
+            genericResponse = getTrustedByUsers(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -125,7 +124,7 @@ public class TrustedUsersHandler {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
                 List<User> trustedByUsers = currentUser.getTrustedByUsers();
-                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(trustedByUsers));
+                genericResponse.setResponse(MiscUtils.toJson(trustedByUsers));
                 tx.commit();
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
@@ -140,7 +139,8 @@ public class TrustedUsersHandler {
     public static GenericResponse handleRemoveTrustedUser(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = removeTrustedUser(AuthorizedRequestBuilder.builder().build(request.getBody()));
+            AuthorizedRequest authorizedRequest = MiscUtils.fromJson(request.getBody(), AuthorizedRequest.class);
+            genericResponse = removeTrustedUser(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -158,7 +158,7 @@ public class TrustedUsersHandler {
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
-                String username = new Gson().fromJson(request.getBody(), JsonObject.class).get("username").getAsString();
+                String username = ((JsonObject) MiscUtils.fromJson(request.getBody(), JsonObject.class)).get("username").getAsString();
                 User user = session.createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
                 if (user != null) {
                     if (currentUser.getTrustedUsers().contains(user)) {

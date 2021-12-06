@@ -1,13 +1,19 @@
 package com.haidousm.rona.server.handlers;
 
-import com.google.gson.Gson;
 import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.enums.Status;
+import com.haidousm.rona.common.utils.MiscUtils;
 
 import java.io.*;
 import java.net.Socket;
 
+
+/**
+ * ClientHandler
+ * Handles the client requests
+ * Has 0 knowledge of the contents of the message, just the METHOD.
+ */
 
 public class ClientHandler implements Runnable {
     private final Socket socket;
@@ -29,11 +35,26 @@ public class ClientHandler implements Runnable {
         try {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                GenericRequest request = new Gson().fromJson(line, GenericRequest.class);
+
+                /*
+                 * LINE looks like:
+                 * {"method":"LOGIN", body: "jsonBody"}
+                 * jsonBody looks like:
+                 * {"username":"username", "password":"password"} for example
+                 */
+
+                GenericRequest request = MiscUtils.fromJson(line, GenericRequest.class);
                 request.setIPAddress(socket.getInetAddress().getHostAddress());
                 request.setPort(socket.getPort());
+
+                /*
+                 * GenericRequest looks like:
+                 * - method: LOGIN
+                 * - body: "{"username":"username", "password":"password"}"
+                 */
+
                 GenericResponse genericResponse = handleRequest(request);
-                bufferedWriter.write(genericResponse.toString());
+                bufferedWriter.write(MiscUtils.toJson(genericResponse));
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }
@@ -51,6 +72,11 @@ public class ClientHandler implements Runnable {
     }
 
     private GenericResponse handleRequest(GenericRequest request) {
+        /* We abstract away the contents of the request and only care about the method
+         * The handlers are responsible for handling the request and returning a response
+         * they are the ones that know the contents of the request
+         */
+
         GenericResponse genericResponse;
         switch (request.getMethod()) {
             case LOGIN:
@@ -84,7 +110,7 @@ public class ClientHandler implements Runnable {
                 genericResponse = TrustedUsersHandler.handleGetTrustedByUsers(request);
                 break;
             case UPDATE_USER_LOCATION:
-                genericResponse=LocationHandler.handleUpdateUserLocation(request);
+                genericResponse = LocationHandler.handleUpdateUserLocation(request);
                 break;
             case ADD_TRUSTED_USER:
                 genericResponse = TrustedUsersHandler.handleAddTrustedUser(request);

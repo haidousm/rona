@@ -1,17 +1,12 @@
 package com.haidousm.rona.client.client;
 
-import com.google.gson.Gson;
-import com.haidousm.rona.client.controllers.AuthorizedRequestsController;
-import com.haidousm.rona.client.gui.HomeGUI;
-import com.haidousm.rona.client.gui.NotificationGUI;
+import com.haidousm.rona.client.gui.Notifications;
 import com.haidousm.rona.common.entity.HealthStatus;
-import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.requests.Request;
 import com.haidousm.rona.common.responses.GenericResponse;
-import com.haidousm.rona.common.responses.builders.HealthStatusResponseBuilder;
+import com.haidousm.rona.common.utils.MiscUtils;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,6 +14,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -27,56 +23,52 @@ public class Client {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private String ip;
-    private int port;
-
-    private ScheduledExecutorService locationExecutor;
-    private ScheduledFuture<?> locationFuture;
-
-    private ScheduledExecutorService healthStatusExecutor;
-    private ScheduledFuture<?> healthStatusFuture;
-
-
-    List<Integer[]> possibleCoords = new ArrayList<>() {
-        {
-//            add(new Integer[]{0, 0});
-//            add(new Integer[]{0, 1});
-//            add(new Integer[]{0, 2});
-//            add(new Integer[]{1, 0});
-//            add(new Integer[]{1, 1});
-//            add(new Integer[]{1, 2});
-//            add(new Integer[]{2, 0});
-//            add(new Integer[]{2, 1});
-//            add(new Integer[]{2, 2});
-            add(new Integer[]{0, 0});
-            add(new Integer[]{0, 1});
-        }
-    };
 
     private String token = "";
+    private HealthStatus healthStatus;
+    private Notifications currentFrame;
 
-    private NotificationGUI currentFrame;
+    private final ScheduledFuture<?> sixtySecondsFuture;
+    private final ScheduledFuture<?> thirtySecondsFuture;
 
     public Client(String ip, int port) throws IOException {
-        this.ip = ip;
-        this.port = port;
         socket = new Socket(ip, port);
         in = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
 
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+        sixtySecondsFuture = executor.scheduleAtFixedRate(() -> {
+            try {
+                if (currentFrame != null) {
+                    currentFrame.pollHealthStatus();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, 0, 30, java.util.concurrent.TimeUnit.SECONDS);
+
+        thirtySecondsFuture = executor.scheduleAtFixedRate(() -> {
+            try {
+                if (currentFrame != null) {
+                    currentFrame.transmitCurrentLocation();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, 0, 15, java.util.concurrent.TimeUnit.SECONDS);
     }
 
     private void send(Request request) {
         GenericRequest genericRequest = new GenericRequest();
         genericRequest.setMethod(request.getMethod());
-        genericRequest.setBody(new Gson().toJson(request));
-        out.println(new Gson().toJson(genericRequest));
+        genericRequest.setBody(MiscUtils.toJson(request));
+        out.println(MiscUtils.toJson(genericRequest));
         out.flush();
     }
 
     private GenericResponse receive() {
         try {
-            return new Gson().fromJson(in.readLine(), GenericResponse.class);
+            return MiscUtils.fromJson(in.readLine(), GenericResponse.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -91,6 +83,8 @@ public class Client {
     public void close() {
         try {
             socket.close();
+            sixtySecondsFuture.cancel(true);
+            thirtySecondsFuture.cancel(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,57 +98,30 @@ public class Client {
         this.token = token;
     }
 
-    public void beginTransmittingLocation(int interval) {
-        Runnable transmitLocation = () -> {
-            if (!Thread.currentThread().isInterrupted()) {
-                Integer[] coords = possibleCoords.get(new Random().nextInt(possibleCoords.size()));
-                Request request = AuthorizedRequestsController.prepareUpdateUserLocationRequest(token, coords);
-                this.sendAndReceive(request);
+    public HealthStatus getHealthStatus() {
+        return healthStatus;
+    }
+
+    public void setHealthStatus(HealthStatus healthStatus) {
+        this.healthStatus = healthStatus;
+    }
+
+    public Integer[] getCurrentLocation() {
+        List<Integer[]> possibleCoords = new ArrayList<>() {
+            {
+                add(new Integer[]{0, 0});
+                add(new Integer[]{0, 1});
             }
         };
-        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
-        this.locationFuture = exec.scheduleAtFixedRate(transmitLocation, 0, interval, java.util.concurrent.TimeUnit.SECONDS);
-        this.locationExecutor = exec;
+        return possibleCoords.get(new Random().nextInt(possibleCoords.size()));
     }
 
-    public void stopTransmittingLocation() {
-        if (locationFuture != null) {
-            this.locationFuture.cancel(true);
-            this.locationExecutor.shutdown();
-        }
-    }
-
-    public void pollHealthStatus(int interval) {
-        Runnable pollHealthStatus = () -> {
-            if (!Thread.currentThread().isInterrupted()) {
-                Request request = AuthorizedRequestsController.prepareGetHealthStatusRequest(token);
-                HealthStatus healthStatus = HealthStatusResponseBuilder.builder().build(this.sendAndReceive(request));
-                if (healthStatus.getStatus() == Health.AT_RISK || healthStatus.getStatus() == Health.CONTAGIOUS) {
-
-                    this.currentFrame.atRisk();
-                    this.stopPollingHealthStatus();
-                    Thread.currentThread().interrupt();
-                }
-            }
-
-        };
-        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
-        this.healthStatusExecutor = exec;
-        this.healthStatusFuture = exec.scheduleAtFixedRate(pollHealthStatus, 0, interval, java.util.concurrent.TimeUnit.SECONDS);
-    }
-
-    public void stopPollingHealthStatus() {
-        if (this.healthStatusFuture != null) {
-            this.healthStatusFuture.cancel(true);
-            this.healthStatusExecutor.shutdown();
-        }
-    }
-
-    public void setCurrentFrame(NotificationGUI currentFrame) {
+    public void setCurrentFrame(Notifications currentFrame) {
         this.currentFrame = currentFrame;
     }
 
-    public NotificationGUI getCurrentFrame() {
+    public Notifications getCurrentFrame() {
         return currentFrame;
     }
+
 }

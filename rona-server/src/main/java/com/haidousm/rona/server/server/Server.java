@@ -7,13 +7,16 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Server
+ * Accepts new TCP connection and hands it to the ClientHandler Runnable
+ */
+
 public class Server {
 
     private ServerSocket serverSocket;
-    private final int port;
 
     public Server(int port) {
-        this.port = port;
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);

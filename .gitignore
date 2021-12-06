@@ -7,7 +7,5 @@
 log/
 target/
 
-testDB.lock.db
-testDB.mv.db
-testDB.trace.db
+*.db
 user-data
