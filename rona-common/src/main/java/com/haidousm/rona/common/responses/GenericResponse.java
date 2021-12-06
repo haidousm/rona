@@ -1,11 +1,16 @@
 package com.haidousm.rona.common.responses;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
 import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.enums.Status;
+import com.haidousm.rona.common.utils.MiscUtils;
 
 public class GenericResponse implements Response {
+
+    @Expose
     private Status status;
+    @Expose
     private String response = "";
 
     public GenericResponse() {
@@ -36,10 +41,6 @@ public class GenericResponse implements Response {
 
     public void setResponse(String response) {
         this.response = response;
-    }
-
-    public String toString() {
-        return new Gson().toJson(this);
     }
 }
 

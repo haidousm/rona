@@ -1,11 +1,14 @@
 package com.haidousm.rona.common.requests;
 
 
-import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
 import com.haidousm.rona.common.enums.Method;
 
 public class LoginRequest extends GenericRequest {
+
+    @Expose
     private final String username;
+    @Expose
     private final String password;
 
     public LoginRequest(String username, String password) {
@@ -19,10 +22,6 @@ public class LoginRequest extends GenericRequest {
 
     public String getPassword() {
         return password;
-    }
-
-    public String toString() {
-        return new Gson().toJson(this);
     }
 
     @Override

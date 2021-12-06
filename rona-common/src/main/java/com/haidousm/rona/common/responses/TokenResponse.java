@@ -1,13 +1,20 @@
 package com.haidousm.rona.common.responses;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.enums.Status;
 
 public class TokenResponse implements Response {
     private Status status;
-    private final String token;
-    private final long expiryTimestamp;
+    @Expose
+    private String token;
+    @Expose
+    private long expiryTimestamp;
+
+    public TokenResponse() {
+
+    }
 
     public TokenResponse(String token, long expiryTimestamp) {
         this.token = token;

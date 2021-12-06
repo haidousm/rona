@@ -1,5 +1,6 @@
 package com.haidousm.rona.common.requests;
 
+import com.google.gson.annotations.Expose;
 import com.haidousm.rona.common.enums.Method;
 import com.sun.istack.Nullable;
 
@@ -9,7 +10,10 @@ public class GenericRequest implements Request {
     private String ipAddress;
     @Nullable
     private int port;
+
+    @Expose
     Method method;
+    @Expose
     private String body;
 
     public void setIPAddress(String ipAddress) {

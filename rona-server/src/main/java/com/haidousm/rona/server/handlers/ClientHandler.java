@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.enums.Status;
+import com.haidousm.rona.common.utils.MiscUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -43,7 +44,7 @@ public class ClientHandler implements Runnable {
                  * {"username":"username", "password":"password"} for example
                  */
 
-                GenericRequest request = new Gson().fromJson(line, GenericRequest.class);
+                GenericRequest request = MiscUtils.fromJson(line, GenericRequest.class);
                 request.setIPAddress(socket.getInetAddress().getHostAddress());
                 request.setPort(socket.getPort());
 
@@ -54,7 +55,7 @@ public class ClientHandler implements Runnable {
                  */
 
                 GenericResponse genericResponse = handleRequest(request);
-                bufferedWriter.write(genericResponse.toString());
+                bufferedWriter.write(MiscUtils.toJson(genericResponse));
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }

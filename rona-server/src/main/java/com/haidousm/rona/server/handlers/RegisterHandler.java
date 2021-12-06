@@ -6,7 +6,6 @@ import com.haidousm.rona.common.entity.HealthStatus;
 import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.responses.TokenResponse;
-import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.enums.Status;
@@ -24,10 +23,10 @@ public class RegisterHandler {
     public static GenericResponse handleRegister(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            RegisterRequest registerRequest = new Gson().fromJson(request.getBody(), RegisterRequest.class);
+            RegisterRequest registerRequest = MiscUtils.fromJson(request.getBody(), RegisterRequest.class);
             TokenResponse tokenResponse = register(registerRequest);
             genericResponse.setStatus(tokenResponse.getStatus());
-            genericResponse.setResponse(new Gson().toJson(tokenResponse));
+            genericResponse.setResponse(MiscUtils.toJson(tokenResponse));
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }
@@ -35,7 +34,7 @@ public class RegisterHandler {
     }
 
     private static TokenResponse register(RegisterRequest registerRequest) {
-        TokenResponse tokenResponse = AuthResponseBuilder.builder().build();
+        TokenResponse tokenResponse = new TokenResponse();
 
         if (registerRequest.getImageFile().isEmpty()) {
             tokenResponse.setStatus(Status.BAD_REQUEST);
@@ -75,7 +74,7 @@ public class RegisterHandler {
             session.save(healthStatus);
             session.save(connectionDetails);
             tx.commit();
-            tokenResponse = AuthResponseBuilder.builder().setToken(token).setExpiryTimestamp(expiryTimestamp).build();
+            tokenResponse = new TokenResponse(token, expiryTimestamp);
             tokenResponse.setStatus(Status.SUCCESS);
             session.close();
         } catch (Exception e) {

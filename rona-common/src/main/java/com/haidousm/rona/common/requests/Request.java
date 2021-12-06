@@ -12,4 +12,6 @@ public interface Request {
     int getPort();
 
     void setPort(int port);
+
+    String getBody();
 }

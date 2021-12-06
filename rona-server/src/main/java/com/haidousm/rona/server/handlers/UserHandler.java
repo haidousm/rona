@@ -9,6 +9,7 @@ import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.entity.UserAuthToken;
+import com.haidousm.rona.common.utils.MiscUtils;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -20,7 +21,7 @@ public class UserHandler {
     public static GenericResponse handleGetUserDetails(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            AuthorizedRequest authorizedRequest = new Gson().fromJson(request.getBody(), AuthorizedRequest.class);
+            AuthorizedRequest authorizedRequest = MiscUtils.fromJson(request.getBody(), AuthorizedRequest.class);
             genericResponse = getUserDetailsByUsername(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
@@ -36,11 +37,11 @@ public class UserHandler {
         Transaction tx = session.beginTransaction();
         UserAuthToken userAuthToken = session.createQuery("from UserAuthToken where token = :token", UserAuthToken.class).setParameter("token", token).getSingleResult();
         if (userAuthToken != null) {
-            JsonObject jsonObject = new Gson().fromJson(authorizedRequest.getBody(), JsonObject.class);
+            JsonObject jsonObject = MiscUtils.fromJson(authorizedRequest.getBody(), JsonObject.class);
             String username = jsonObject.get("username").getAsString();
             User user = session.createQuery("from User where username = :username", User.class).setParameter("username", username).getSingleResult();
             if (user != null) {
-                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(user));
+                genericResponse.setResponse(MiscUtils.toJson(user));
             } else {
                 genericResponse.setStatus(Status.USER_NOT_FOUND);
             }
@@ -69,7 +70,7 @@ public class UserHandler {
         Transaction tx = session.beginTransaction();
         List<User> users = session.createQuery("from User", User.class).getResultList();
         tx.commit();
-        genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(users));
+        genericResponse.setResponse(MiscUtils.toJson(users));
         session.close();
         return genericResponse;
     }
@@ -77,7 +78,7 @@ public class UserHandler {
     public static GenericResponse handleGetCurrentUserDetails(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            AuthorizedRequest authorizedRequest = new Gson().fromJson(request.getBody(), AuthorizedRequest.class);
+            AuthorizedRequest authorizedRequest = MiscUtils.fromJson(request.getBody(), AuthorizedRequest.class);
             genericResponse = getCurrentUserDetails(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
@@ -96,7 +97,7 @@ public class UserHandler {
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
-                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(currentUser));
+                genericResponse.setResponse(MiscUtils.toJson(currentUser));
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
             }

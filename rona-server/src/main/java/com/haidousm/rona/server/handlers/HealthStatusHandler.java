@@ -12,6 +12,7 @@ import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.requests.GenericRequest;
 import com.haidousm.rona.common.responses.GenericResponse;
+import com.haidousm.rona.common.utils.MiscUtils;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -22,7 +23,7 @@ public class HealthStatusHandler {
     public static GenericResponse handleGetCurrentUserHealthStatus(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            AuthorizedRequest authorizedRequest = new Gson().fromJson(request.getBody(), AuthorizedRequest.class);
+            AuthorizedRequest authorizedRequest = MiscUtils.fromJson(request.getBody(), AuthorizedRequest.class);
             genericResponse = getCurrentUserHealthStatus(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
@@ -41,7 +42,7 @@ public class HealthStatusHandler {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
                 HealthStatus healthStatus = currentUser.getHealthStatuses().get(0);
-                genericResponse.setResponse(new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(healthStatus));
+                genericResponse.setResponse(MiscUtils.toJson(healthStatus));
                 tx.commit();
             } else {
                 genericResponse.setStatus(Status.INTERNAL_SERVER_ERROR);
@@ -56,7 +57,7 @@ public class HealthStatusHandler {
     public static GenericResponse handleUpdateCurrentUserHealthStatus(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            AuthorizedRequest authorizedRequest = new Gson().fromJson(request.getBody(), AuthorizedRequest.class);
+            AuthorizedRequest authorizedRequest = MiscUtils.fromJson(request.getBody(), AuthorizedRequest.class);
             genericResponse = updateCurrentUserHealthStatus(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
@@ -74,7 +75,7 @@ public class HealthStatusHandler {
         if (userAuthToken != null) {
             User currentUser = userAuthToken.getUser();
             if (currentUser != null) {
-                JsonObject jsonObject = new Gson().fromJson(authorizedRequest.getBody(), JsonObject.class);
+                JsonObject jsonObject = MiscUtils.fromJson(authorizedRequest.getBody(), JsonObject.class);
                 Health health = Health.valueOf(jsonObject.get("status").getAsString());
                 HealthStatus healthStatus = new HealthStatus(health, currentUser);
                 session.save(healthStatus);
