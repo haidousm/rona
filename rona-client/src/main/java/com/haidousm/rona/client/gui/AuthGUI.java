@@ -4,7 +4,7 @@ import com.haidousm.rona.client.client.Client;
 import com.haidousm.rona.client.controllers.UserController;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.responses.AuthResponse;
+import com.haidousm.rona.common.responses.TokenResponse;
 import com.haidousm.rona.common.responses.builders.AuthResponseBuilder;
 
 import javax.swing.*;
@@ -88,7 +88,7 @@ public class AuthGUI extends JFrame implements NotificationGUI {
         String username = usernameTextField.getText();
         String password = new String(passwordTextField.getPassword());
         Request request = UserController.prepareLogin(username, password);
-        AuthResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
+        TokenResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
         if (response.getStatus() == Status.SUCCESS) {
             client.setToken(response.getToken());
             client.beginTransmittingLocation(60);
@@ -106,7 +106,7 @@ public class AuthGUI extends JFrame implements NotificationGUI {
         String lastName = lastNameTextField.getText();
         boolean isVaccinated = isVaccinatedCheckbox.isSelected();
         Request request = UserController.prepareRegisterUser(firstName, lastName, email, username, password, isVaccinated, pdfFilePath, imageFilePath);
-        AuthResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
+        TokenResponse response = AuthResponseBuilder.builder().build(client.sendAndReceive(request));
         if (response.getStatus() == Status.SUCCESS) {
             client.setToken(response.getToken());
             client.beginTransmittingLocation(60);

@@ -7,7 +7,6 @@ import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.requests.GenericRequest;
-import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.common.responses.StatsResponse;
 import com.haidousm.rona.common.responses.builders.StatsResponseBuilder;
@@ -21,7 +20,8 @@ public class StatsHandler {
     public static GenericResponse handleGetStats(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            StatsResponse statsResponse = getStats(AuthorizedRequestBuilder.builder().build(request.getBody()));
+            AuthorizedRequest authorizedRequest = new Gson().fromJson(request.getBody(), AuthorizedRequest.class);
+            StatsResponse statsResponse = getStats(authorizedRequest);
             genericResponse.setStatus(statsResponse.getStatus());
             genericResponse.setResponse(new Gson().toJson(statsResponse));
         } catch (Exception e) {

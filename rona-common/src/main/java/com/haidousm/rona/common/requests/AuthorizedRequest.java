@@ -5,6 +5,11 @@ import com.haidousm.rona.common.enums.Method;
 public class AuthorizedRequest extends GenericRequest {
     private String token;
 
+    public AuthorizedRequest(Method method, String token) {
+        this.token = token;
+        this.setMethod(method);
+    }
+
     public AuthorizedRequest(Method method, String token, String body) {
         this.setMethod(method);
         this.token = token;
@@ -14,6 +19,5 @@ public class AuthorizedRequest extends GenericRequest {
     public String getToken() {
         return token;
     }
-
 
 }

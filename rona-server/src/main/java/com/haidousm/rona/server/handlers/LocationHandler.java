@@ -8,7 +8,6 @@ import com.haidousm.rona.common.entity.UserAuthToken;
 import com.haidousm.rona.common.enums.Status;
 import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.requests.GenericRequest;
-import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
 import com.haidousm.rona.server.utils.HibernateUtil;
 import org.hibernate.Session;
@@ -19,7 +18,8 @@ public class LocationHandler {
     public static GenericResponse handleUpdateUserLocation(GenericRequest request) {
         GenericResponse genericResponse = new GenericResponse();
         try {
-            genericResponse = updateUserLocation(AuthorizedRequestBuilder.builder().build(request.getBody()));
+            AuthorizedRequest authorizedRequest = new Gson().fromJson(request.getBody(), AuthorizedRequest.class);
+            genericResponse = updateUserLocation(authorizedRequest);
         } catch (Exception e) {
             genericResponse.setStatus(Status.BAD_REQUEST);
         }

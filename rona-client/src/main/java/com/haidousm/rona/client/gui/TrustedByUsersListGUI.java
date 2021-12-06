@@ -1,12 +1,10 @@
 package com.haidousm.rona.client.gui;
 
 import com.haidousm.rona.client.client.Client;
-import com.haidousm.rona.common.entity.HealthStatus;
 import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.enums.Method;
+import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
-import com.haidousm.rona.common.responses.builders.HealthStatusResponseBuilder;
 import com.haidousm.rona.common.responses.builders.UserResponseBuilder;
 
 import javax.swing.*;
@@ -45,7 +43,7 @@ public class TrustedByUsersListGUI extends JFrame implements NotificationGUI {
     private void setupTrustedByUsersTable() {
         String[] columnNames = {"Username", "First Name", "Last Name", "Health Status"};
         List<Object[]> data = new ArrayList<>();
-        Request request = AuthorizedRequestBuilder.builder().setMethod(Method.GET_TRUSTED_BY_USERS).setToken(client.getToken()).build();
+        Request request = new AuthorizedRequest(Method.GET_TRUSTED_BY_USERS, client.getToken());
         List<User> users = UserResponseBuilder.builder().buildList(client.sendAndReceive(request));
 
         for (User user : users) {

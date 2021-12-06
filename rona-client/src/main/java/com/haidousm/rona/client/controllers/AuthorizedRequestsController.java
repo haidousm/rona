@@ -4,33 +4,32 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.haidousm.rona.common.enums.Health;
 import com.haidousm.rona.common.enums.Method;
+import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 
 public class AuthorizedRequestsController {
     public static Request prepareGetHealthStatusRequest(String token) {
-        return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.GET_HEALTH_STATUS).build();
+        return new AuthorizedRequest(Method.GET_HEALTH_STATUS, token);
     }
 
     public static Request prepareUpdateHealthStatusRequest(String token, Health healthStatus) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("status", healthStatus.name());
-        return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.UPDATE_HEALTH_STATUS).setBody(new Gson().toJson(jsonObject)).build();
+        return new AuthorizedRequest(Method.UPDATE_HEALTH_STATUS, token, new Gson().toJson(jsonObject));
     }
 
     public static Request prepareGetStatsRequest(String token) {
-        return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.GET_STATS).build();
+        return new AuthorizedRequest(Method.GET_STATS, token);
     }
 
     public static Request prepareGetTrustedUsersRequest(String token) {
-        return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.GET_TRUSTED_USERS).build();
+        return new AuthorizedRequest(Method.GET_TRUSTED_USERS, token);
     }
 
     public static Request prepareUpdateUserLocationRequest(String token, Integer[] coords) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("latitude", coords[0]);
         jsonObject.addProperty("longitude", coords[1]);
-        return AuthorizedRequestBuilder.builder().setToken(token).setMethod(Method.UPDATE_USER_LOCATION).setBody(new Gson().toJson(jsonObject)).build();
+        return new AuthorizedRequest(Method.UPDATE_USER_LOCATION, token, new Gson().toJson(jsonObject));
     }
-
 }

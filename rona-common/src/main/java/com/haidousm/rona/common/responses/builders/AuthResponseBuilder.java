@@ -2,7 +2,7 @@ package com.haidousm.rona.common.responses.builders;
 
 import com.google.gson.Gson;
 import com.haidousm.rona.common.responses.GenericResponse;
-import com.haidousm.rona.common.responses.AuthResponse;
+import com.haidousm.rona.common.responses.TokenResponse;
 
 public class AuthResponseBuilder {
     private String token;
@@ -18,14 +18,14 @@ public class AuthResponseBuilder {
         return this;
     }
 
-    public AuthResponse build() {
-        return new AuthResponse(token, expiryTimestamp);
+    public TokenResponse build() {
+        return new TokenResponse(token, expiryTimestamp);
     }
 
-    public AuthResponse build(GenericResponse genericResponse) {
-        AuthResponse authResponse = new Gson().fromJson(genericResponse.getResponse(), AuthResponse.class);
-        authResponse.setStatus(genericResponse.getStatus());
-        return authResponse;
+    public TokenResponse build(GenericResponse genericResponse) {
+        TokenResponse tokenResponse = new Gson().fromJson(genericResponse.getResponse(), TokenResponse.class);
+        tokenResponse.setStatus(genericResponse.getStatus());
+        return tokenResponse;
     }
 
     public static AuthResponseBuilder builder() {

@@ -1,10 +1,10 @@
 package com.haidousm.rona.client.controllers;
 
 import com.haidousm.rona.common.enums.Method;
-import com.haidousm.rona.common.requests.builders.LoginRequestBuilder;
-import com.haidousm.rona.common.requests.builders.RegisterRequestBuilder;
+import com.haidousm.rona.common.requests.AuthorizedRequest;
+import com.haidousm.rona.common.requests.LoginRequest;
+import com.haidousm.rona.common.requests.RegisterRequest;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.utils.MiscUtils;
 
 import java.nio.file.Path;
@@ -23,17 +23,17 @@ public class UserController {
         if (imageFilePath.toFile().exists()) {
             imageFile = MiscUtils.encodeFileToBase64(imageFilePath);
         }
-        return RegisterRequestBuilder.builder().setFirstname(firstname).setLastname(lastname).setEmail(email).setUsername(username).setPassword(password).setVaccinated(isVaccinated).setVaccineCertificateFile(vaccineCertificateFile).setImageFile(imageFile).build();
+        return new RegisterRequest(firstname, lastname, email, username, password, isVaccinated, vaccineCertificateFile, imageFile);
     }
 
     public static Request prepareLogin(String username, String password) {
         // TODO: validate input
         // TODO: encrypt password?
 
-        return LoginRequestBuilder.builder().setUsername(username).setPassword(password).build();
+        return new LoginRequest(username, password);
     }
 
     public static Request prepareGetCurrentUser(String token) {
-        return AuthorizedRequestBuilder.builder().setMethod(Method.GET_USER).setToken(token).build();
+        return new AuthorizedRequest(Method.GET_USER, token);
     }
 }

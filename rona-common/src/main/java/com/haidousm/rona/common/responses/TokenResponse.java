@@ -4,12 +4,12 @@ import com.google.gson.GsonBuilder;
 import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.enums.Status;
 
-public class AuthResponse implements Response {
+public class TokenResponse implements Response {
     private Status status;
     private final String token;
     private final long expiryTimestamp;
 
-    public AuthResponse(String token, long expiryTimestamp) {
+    public TokenResponse(String token, long expiryTimestamp) {
         this.token = token;
         this.expiryTimestamp = expiryTimestamp;
     }

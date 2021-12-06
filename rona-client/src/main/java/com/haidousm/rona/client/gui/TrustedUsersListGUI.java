@@ -3,13 +3,13 @@ package com.haidousm.rona.client.gui;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.haidousm.rona.client.client.Client;
+import com.haidousm.rona.client.controllers.AuthorizedRequestsController;
 import com.haidousm.rona.common.entity.User;
 import com.haidousm.rona.common.enums.Method;
 import com.haidousm.rona.common.enums.Status;
+import com.haidousm.rona.common.requests.AuthorizedRequest;
 import com.haidousm.rona.common.requests.Request;
-import com.haidousm.rona.common.requests.builders.AuthorizedRequestBuilder;
 import com.haidousm.rona.common.responses.GenericResponse;
-import com.haidousm.rona.common.responses.builders.GenericResponseBuilder;
 import com.haidousm.rona.common.responses.builders.UserResponseBuilder;
 
 import javax.swing.*;
@@ -56,7 +56,7 @@ public class TrustedUsersListGUI extends JFrame implements NotificationGUI {
         String[] columnNames = {"Username", "First Name", "Last Name", "Email", ""};
         List<Object[]> data = new ArrayList<>();
 
-        Request request = AuthorizedRequestBuilder.builder().setMethod(Method.GET_TRUSTED_USERS).setToken(client.getToken()).build();
+        Request request = AuthorizedRequestsController.prepareGetTrustedUsersRequest(client.getToken());
         List<User> trustedUsers = UserResponseBuilder.builder().buildList(client.sendAndReceive(request));
         for (User user : trustedUsers) {
             JButton removeButton = new JButton("Remove");
@@ -88,7 +88,7 @@ public class TrustedUsersListGUI extends JFrame implements NotificationGUI {
     private void handleRemoveTrustedUser(User user) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("username", user.getUsername());
-        Request request = AuthorizedRequestBuilder.builder().setMethod(Method.REMOVE_TRUSTED_USER).setToken(client.getToken()).setBody(new Gson().toJson(jsonObject)).build();
+        Request request = new AuthorizedRequest(Method.REMOVE_TRUSTED_USER, client.getToken(), new Gson().toJson(jsonObject));
         GenericResponse response = client.sendAndReceive(request);
         if (response.getStatus() == Status.SUCCESS) {
             JOptionPane.showMessageDialog(this, "User removed from trusted users list", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -103,7 +103,7 @@ public class TrustedUsersListGUI extends JFrame implements NotificationGUI {
         String username = searchTextField.getText();
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("username", username);
-        Request request = AuthorizedRequestBuilder.builder().setMethod(Method.ADD_TRUSTED_USER).setToken(client.getToken()).setBody(new Gson().toJson(jsonObject)).build();
+        Request request = new AuthorizedRequest(Method.ADD_TRUSTED_USER, client.getToken(), new Gson().toJson(jsonObject));
         GenericResponse response = client.sendAndReceive(request);
         if (response.getStatus() == Status.USER_NOT_FOUND) {
             JOptionPane.showMessageDialog(this, "User not found", "Error", JOptionPane.ERROR_MESSAGE);
